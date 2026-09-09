@@ -1,0 +1,22 @@
+{
+  "name": "internconnect",
+  "version": "1.0.0",
+  "description": "Internix - A Student Internship & OJT Opportunity Finder with free, local Smart Internship Matching.",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "keywords": [
+    "internship",
+    "ojt",
+    "students",
+    "matching",
+    "sqlite"
+  ],
+  "license": "MIT"
+}
