@@ -205,7 +205,14 @@ function initSchema() {
       student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
       opportunity_id INTEGER NOT NULL REFERENCES internship_opportunities(id) ON DELETE CASCADE,
       PRIMARY KEY (student_id, opportunity_id)
-        );
+    );
+
+    CREATE TABLE IF NOT EXISTS program_relationships (
+      program_id INTEGER NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
+      related_program_id INTEGER NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
+      relationship_type TEXT,
+      PRIMARY KEY (program_id, related_program_id)
+    );
   `);
 
   // --- migrations for existing databases ---
@@ -215,8 +222,12 @@ function initSchema() {
   addColumnIfMissing('companies', 'careers_url', 'careers_url TEXT');
   addColumnIfMissing('companies', 'company_size', 'company_size TEXT');
   addColumnIfMissing('companies', 'year_established', 'year_established INTEGER');
-    addColumnIfMissing('companies', 'verified_at', 'verified_at TEXT');
+  addColumnIfMissing('companies', 'verified_at', 'verified_at TEXT');
   addColumnIfMissing('companies', 'source_name', 'source_name TEXT');
+  addColumnIfMissing('companies', 'address', 'address TEXT');
+  addColumnIfMissing('programs', 'description', 'description TEXT');
+  addColumnIfMissing('internship_opportunities', 'internship_type', 'internship_type TEXT');
+  addColumnIfMissing('internship_opportunities', 'last_verified_at', 'last_verified_at TEXT');
 }
 
 module.exports = { initSchema, run, get, all, lastInsertId, exec };

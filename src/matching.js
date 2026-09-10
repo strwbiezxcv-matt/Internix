@@ -1,50 +1,51 @@
 'use strict';
 
 /**
- * InternConnect — Smart Internship Matching
- * ----------------------------------------
+ * Internix - Program-Based Internship Matching
+ * --------------------------------------------------
+ * A fully local, transparent, deterministic compatibility engine. No AI, no
+ * paid APIs - it uses ordinary application logic and data stored in the
+ * database (programs, program relationships, the preferred/related programs
+ * listed on each opportunity, and the opportunity's internship field).
  *
- * A fully local, transparent, weighted compatibility algorithm. No AI, no APIs,
- * no paid services — it runs on ordinary application logic and database data.
+ * Internix is a DISCOVERY platform. This score measures "student program to
+ * opportunity" compatibility so results can be ranked by relevance. It is NOT
+ * a prediction of acceptance or hiring.
  *
- * It deliberately prioritizes REAL compatibility over simply matching the
- * student's course name. For example, a BE/CPE student with HTML/CSS/JS can be
- * recommended a "Web Development Intern" even when a company lists BSIT first,
- * because skills, interests and related-program knowledge carry weight.
+ * The selected academic program is the primary input. Opportunities that
+ * explicitly list the student's program (or a closely related program) as
+ * preferred score highest. For opportunities open to all programs, the
+ * opportunity's internship field is compared to the student's program fields
+ * to rank relevance (e.g. a Computer Engineering student ranks above a
+ * Business student for an advertised technology internship).
  *
- * Weighting (adjustable here to keep scoring logical and explainable):
- *   Course compatibility            : 25%
- *   Specialization compatibility    : 15%
- *   Skills compatibility            : 30%
- *   Interest / internship field     : 15%
- *   Location compatibility          : 10%
- *   Work arrangement compatibility  :  5%
+ * Weighting (kept here so scoring stays logical & explainable):
+ *   Program compatibility   : 55%
+ *   Internship field overlap: 25%
+ *   Location compatibility   : 10%
+ *   Work arrangement         : 10%
  *   -------------------------------------------------
- *   Total                           : 100%
- *
- * Modular by design: a future optional AI layer can be plugged in (richer
- * explanations, description analysis) WITHOUT being required for matching.
+ *   Total                    : 100%
  */
+
+const db = require('./db');
 
 const WEIGHTS = {
-  course: 0.25,
-  specialization: 0.15,
-  skills: 0.30,
-  field: 0.15,
+  program: 0.55,
+  field: 0.25,
   location: 0.10,
-  arrangement: 0.05
+  arrangement: 0.10
 };
 
-/**
- * Programs considered "related" for matching purposes. This enables skill-based
- * cross-program discovery while keeping scores explainable.
- */
-const RELATED_PROGRAMS = {
+/* Fallback related-program map, used only if the program_relationships table
+   is empty (e.g. an un-seeded development database). The seed keeps the
+   authoritative map in the database. Keyed by programme CODE. */
+const DEFAULT_RELATED = {
   BSIT: ['COMPUTER ENGINEERING', 'BINDTECH', 'BSBA'],
   'COMPUTER ENGINEERING': ['BSIT', 'INDUSTRIAL ENGINEERING', 'BINDTECH'],
   BSBA: ['BSENTREP', 'BSIT'],
-  BSENTREP: ['BSBA'],
-  'INDUSTRIAL ENGINEERING': ['BSBA', 'COMPUTER ENGINEERING'],
+  BSENTREP: ['BSBA', 'BSIT'],
+  'INDUSTRIAL ENGINEERING': ['BSBA', 'COMPUTER ENGINEERING', 'BINDTECH'],
   BINDTECH: ['BSIT', 'COMPUTER ENGINEERING', 'INDUSTRIAL ENGINEERING']
 };
 
@@ -52,305 +53,171 @@ function norm(s) {
   return String(s || '').trim().toLowerCase();
 }
 
-function ciEqual(a, b) {
-  return norm(a) === norm(b) && norm(a) !== '';
+function dedupe(arr) {
+  return [...new Set((arr || []).map(norm).filter(Boolean))];
+}
+
+/* Database-driven related programs for a program CODE. Returns codes. */
+function relatedProgramsFor(code) {
+  const row = db.get('SELECT id FROM programs WHERE code = ?', code);
+  if (!row) return DEFAULT_RELATED[code] || [];
+  const codes = db.all(
+    `SELECT p2.code FROM program_relationships r
+       JOIN programs p1 ON p1.id = r.program_id
+       JOIN programs p2 ON p2.id = r.related_program_id
+      WHERE r.program_id = ? ORDER BY p2.code`,
+    row.id
+  ).map((r) => r.code);
+  return codes.length ? codes : (DEFAULT_RELATED[code] || []);
 }
 
 /**
- * Course compatibility (0..1):
- *   1.0 = student's program is explicitly listed as preferred
- *   0.5 = related/acceptable program (or open to all programs)
- *   0.0 = clearly incompatible program
+ * Program compatibility (0..1):
+ *   1.0 = the opportunity explicitly prefers the student's program
+ *   0.75 = the opportunity prefers a closely related program
+ *   0.5 = open to all programs (no restricted list)
+ *   0.25 = the opportunity prefers an unrelated program
  */
-function courseScore(studentProgram, oppPrograms) {
-  const list = (oppPrograms || []).map(norm).filter(Boolean);
-  const sp = norm(studentProgram);
-  if (!sp) return 0.5; // no program on profile — neutral
-  if (list.length === 0) return 0.5; // open to all programs — neutral
-  if (list.includes(sp)) return 1.0;
-  const related = (RELATED_PROGRAMS[studentProgram] || []).map(norm);
-  if (related.some((r) => list.includes(r))) return 0.5;
-  return 0.0;
-}
-/**
- * Specialization compatibility (0..1):
- *   1.0 = exact specialization match
- *   0.5 = related specialization (student's program is listed but not this spec)
- *   0.0 = no/incompatible specialization information
- */
-function specializationScore(studentSpec, oppSpecs, oppPrograms) {
-  const specs = (oppSpecs || []).map(norm).filter(Boolean);
-  if (specs.length === 0) return 0.5; // no specialization requirement — neutral
-  const ss = norm(studentSpec);
-  if (!ss) return 0.0;
-  if (specs.includes(ss)) return 1.0;
-  // Student's specialization isn't required, but their program is listed -> related
-  if ((oppPrograms || []).length > 0) return 0.5;
-  return 0.0;
+function programScore(studentCode, oppPrograms) {
+  const list = dedupe(oppPrograms);
+  const sc = norm(studentCode);
+  if (!sc) return 0.5; // no program selected - neutral
+  if (list.length === 0) return 0.5; // open to all programs - neutral
+  if (list.includes(sc)) return 1.0;
+  if (relatedProgramsFor(studentCode).map(norm).some((r) => list.includes(r))) return 0.75;
+  return 0.25;
 }
 
 /**
- * Skills compatibility (0..1) — the heaviest criterion (30%).
- * Uses coverage: how much of the opportunity's required skills the student has.
- * Recognizes closely-related skill aliases (Photoshop/Canva, AutoCAD/SketchUp).
+ * Field alignment (0..1) - compares the opportunity's internship field to the
+ * student program's field relationships (program_fields / specialization_fields).
+ * Mainly used to rank opportunities advertised as open to any program.
  */
-const SKILL_ALIASES = [
-  ['photoshop', 'canva', 'graphic design', 'adobe'],
-  ['autocad', 'drafting', 'sketchup', 'cad'],
-  ['javascript', 'typescript', 'es6', 'web'],
-  ['wordpress', 'web design', 'html', 'css']
-];
+function fieldScore(profile, oppField) {
+  const sf = norm(oppField);
+  if (!sf) return 0.5; // no field stated - neutral
+  const prog = db.get('SELECT id FROM programs WHERE code = ?', profile.program);
+  if (!prog) return 0.4;
 
-function skillsScore(studentSkills, requiredSkills) {
-  const req = (requiredSkills || []).map(norm).filter(Boolean);
-  if (req.length === 0) return 0.5; // no required skills specified — neutral
-  if (!studentSkills || studentSkills.length === 0) return 0;
-  const have = studentSkills.map(norm).filter(Boolean);
-  function hasSkill(required) {
-    if (have.includes(required)) return true;
-    for (const group of SKILL_ALIASES) {
-      if (group.includes(required) && have.some((h) => group.includes(h))) return true;
-    }
-    if (have.some((h) => h.includes(required) || required.includes(h))) return true;
-    return false;
+  const progFields = new Set(
+    db.all(
+      `SELECT lower(f.name) AS n FROM program_fields pf JOIN internship_fields f ON f.id = pf.field_id WHERE pf.program_id = ?`,
+      prog.id
+    ).map((r) => r.n)
+  );
+
+  if (profile.specialization) {
+    db.all(
+      `SELECT lower(f.name) AS n FROM specialization_fields sfi
+         JOIN specializations s ON s.id = sfi.specialization_id
+         JOIN internship_fields f ON f.id = sfi.field_id
+        WHERE lower(s.name) = ?`, norm(profile.specialization)
+    ).forEach((r) => progFields.add(r.n));
   }
-  // Skills score = percentage of required skills the student actually has.
-  const matched = req.filter((r) => hasSkill(r)).length;
-  return matched / req.length;
-}
 
-/* Nearby-location map (Bulacan priority + Metro Manila). Values are substrings
-   matched against an opportunity's location string. */
-const NEARBY_LOCATIONS = {
-  'bulacan': [
-    'metro manila', 'manila', 'quezon city', 'pampanga', 'nueva ecija', 'tarlac',
-    'valenzuela', 'caloocan', 'malabon', 'navotas', 'central luzon',
-    'malolos', 'bocaue', 'guiguinto', 'plaridel', 'baliwag', 'calumpit'
-  ],
-  'marilao': ['bulacan', 'metro manila', 'valenzuela', 'meycauayan', 'bocaue', 'san jose del monte', 'central luzon'],
-  'meycauayan': ['bulacan', 'valenzuela', 'marilao', 'bocaue', 'caloocan', 'metro manila'],
-  'san jose del monte': ['bulacan', 'quezon city', 'caloocan', 'metro manila', 'marilao'],
-  'malolos': ['bulacan', 'central luzon', 'guiguinto', 'plaridel', 'baliwag', 'pampanga'],
-  'bocaue': ['bulacan', 'marilao', 'meycauayan', 'metro manila'],
-  'guiguinto': ['bulacan', 'malolos', 'baliwag', 'plaridel', 'central luzon'],
-  'plaridel': ['bulacan', 'baliwag', 'guiguinto', 'malolos', 'calumpit'],
-  'baliwag': ['bulacan', 'plaridel', 'guiguinto', 'malolos', 'calumpit'],
-  'pulilan': ['bulacan', 'baliwag', 'calumpit', 'plaridel'],
-  'calumpit': ['bulacan', 'baliwag', 'pulilan', 'plaridel', 'pampanga'],
-  'santa maria': ['bulacan', 'balagtas', 'norzagaray', 'central luzon'],
-  'balagtas': ['bulacan', 'santa maria', 'norzagaray'],
-  'san ildefonso': ['bulacan', 'central luzon'],
-  'obando': ['bulacan', 'central luzon'],
-  'bulakan': ['bulacan', 'marilao', 'meycauayan', 'obando'],
-  'norzagaray': ['bulacan', 'santa maria', 'balagtas', 'central luzon'],
-  'cabang': ['bulacan', 'san ildefonso', 'central luzon'],
-  'metro manila': [
-    'bulacan', 'manila', 'quezon city', 'makati', 'taguig', 'pasig',
-    'mandaluyong', 'valenzuela', 'caloocan', 'pasay', 'parañaque',
-    'muntinlupa', 'marikina', 'las pinas', 'navotas', 'malabon',
-    'san juan', 'pateros', 'central luzon'
-  ],
-  'pampanga': ['bulacan', 'tarlac', 'nueva ecija', 'bataan', 'central luzon', 'angeles'],
-  'manila': ['metro manila', 'quezon city', 'makati', 'pasay', 'taguig'],
-  'quezon city': ['metro manila', 'manila', 'makati', 'taguig', 'pasig', 'caloocan', 'san jose del monte', 'bulacan'],
-  'makati': ['metro manila', 'manila', 'taguig', 'pasay', 'quezon city', 'pasig', 'mandaluyong'],
-  'taguig': ['metro manila', 'makati', 'pasay', 'quezon city', 'manila', 'pasig'],
-  'pasig': ['metro manila', 'mandaluyong', 'makati', 'quezon city', 'taguig'],
-  'mandaluyong': ['metro manila', 'pasig', 'makati', 'quezon city'],
-  'pasay': ['metro manila', 'manila', 'makati', 'taguig', 'parañaque'],
-  'parañaque': ['metro manila', 'pasay', 'taguig', 'manila'],
-  'muntinlupa': ['metro manila', 'taguig', 'manila'],
-  'caloocan': ['metro manila', 'bulacan', 'valenzuela', 'malabon', 'manila'],
-  'marikina': ['metro manila', 'pasig', 'mandaluyong', 'quezon city'],
-  'las pinas': ['metro manila', 'manila', 'navotas'],
-  'valenzuela': ['metro manila', 'bulacan', 'meycauayan', 'marilao', 'caloocan', 'bocaue'],
-  'navotas': ['metro manila', 'manila', 'malabon', 'las pinas'],
-  'malabon': ['metro manila', 'manila', 'caloocan', 'navotas', 'valenzuela'],
-  'san juan': ['metro manila', 'manila'],
-  'pateros': ['metro manila', 'valenzuela', 'manila', 'malabon']
-};
-
-function tokens(s) {
-  return norm(s).split(/[^a-z0-9]+/).filter((t) => t.length > 3);
-}
-
-/**
- * Interest / internship field compatibility (0..1):
- *   1.0  = exact field match
- *   0.75 = closely related (shares a meaningful keyword)
- *   0.5  = somewhat related (one side mentions the other)
- *   0.0  = unrelated / no interest data
- */
-function fieldScore(oppField, studentInterests, preferredField) {
-  const field = norm(oppField);
-  if (!field) return 0.5; // no field specified — neutral
-  const interests = (studentInterests || []).map(norm).filter(Boolean);
-  const all = [...interests];
-  if (preferredField) all.push(norm(preferredField));
-  if (!all.length) return 0.0;
-  if (ciEqual(preferredField, oppField) || interests.includes(field)) return 1.0;
-  const fTokens = tokens(field);
-  for (const i of all) {
-    const iTok = tokens(i);
-    if (fTokens.some((t) => iTok.includes(t) || iTok.some((x) => t.includes(x) && x.length > 3))) {
-      return 0.75;
-    }
-  }
-  return 0.0;
+  if (progFields.size === 0) return 0.4;
+  if (progFields.has(sf)) return 1.0;
+  const hasPartial = [...progFields].some((n) =>
+    n.includes(sf) || sf.includes(n) ||
+    n.split(/\s+/).some((w) => sf.includes(w)));
+  return hasPartial ? 0.7 : 0.2;
 }
 
 /**
  * Location compatibility (0..1):
- *   1.0  = preferred location matches the opportunity location
- *   0.75 = nearby/acceptable (see NEARBY_LOCATIONS)
- *   0.5  = remote/hybrid compatibility where applicable, or unknown
- *   0.0  = incompatible
+ *   1.0 exact, 0.8 same region (Metro Manila municipality), 0.75 Bulacan province,
+ *   0.5 unknown, 0.2 otherwise.
  */
-function locationScore(oppLocation, preferredLocation, oppArrangement) {
-  const o = norm(oppLocation);
-  const p = norm(preferredLocation);
-  if (!o || !p) return 0.5; // unknown — neutral
-  if (o === p || o.includes(p) || p.includes(o)) return 1.0;
-  const near = NEARBY_LOCATIONS[p] || [];
-  if (near.some((n) => o.includes(n))) return 0.75;
-  const arr = norm(oppArrangement);
-  if (arr === 'remote' || arr === 'hybrid') return 0.5;
-  return 0.0;
+function locationScore(studentLoc, oppLoc) {
+  const a = norm(studentLoc);
+  const b = norm(oppLoc);
+  if (!a) return 0.5;
+  if (!b) return 0.5;
+  if (a === b) return 1.0;
+  const METRO = ['metro manila', 'manila', 'makati', 'taguig', 'pasig',
+    'quezon city', 'mandaluyong', 'pasay', 'paranaque', 'muntinlupa',
+    'caloocan', 'marikina', 'las pinas', 'valenzuela', 'navotas', 'malabon',
+    'san juan', 'pateros'];
+  const isMetro = (s) => METRO.includes(s);
+  if (isMetro(a) && isMetro(b)) return 0.8;
+  if (a === 'bulacan' || b === 'bulacan') return 0.75;
+  return 0.2;
+}
+
+function workArrangementScore(pref, actual) {
+  const a = norm(pref);
+  const b = norm(actual);
+  if (!a || !b) return 0.5; // preference or arrangement unknown - neutral
+  if (a === b) return 1.0;
+  return 0.5;
+}
+
+function clamp(pct) {
+  return Math.max(0, Math.min(100, Math.round(pct)));
 }
 
 /**
- * Work arrangement compatibility (0..1):
- *   1.0 = exact match
- *   0.5 = acceptable alternative (hybrid bridges on-site and remote)
- *   0.0 = incompatible
+ * Compute the profile-to-opportunity compatibility score.
+ * profile: { program (code), specialization, location, work_arrangement }
+ * opp: loaded opportunity object (see loaders.loadOpportunity)
  */
-function arrangementScore(oppArrangement, preferredArrangement) {
-  if (!oppArrangement || !preferredArrangement) return 0.5; // unknown — neutral
-  if (ciEqual(oppArrangement, preferredArrangement)) return 1.0;
-  const o = norm(oppArrangement).replace(/[^a-z]/g, '');
-  const p = norm(preferredArrangement).replace(/[^a-z]/g, '');
-  if (o === p) return 1.0;
-  if (o === 'hybrid' || p === 'hybrid') return 0.5;
-  return 0.0;
-}
-/* ------------------------- reasoning helpers ------------------------- */
+function computeMatch(profile, opp) {
+  profile = profile || {};
+  opp = opp || {};
+  const oppPrograms = opp.programs || [];
 
-function courseReason(studentProgram, oppPrograms) {
-  if ((oppPrograms || []).length === 0) return 'Open to all programs';
-  const list = oppPrograms.map(String);
-  if (list.some((p) => ciEqual(p, studentProgram))) return 'Course matches';
-  const sp = String(studentProgram || '');
-  const related = (RELATED_PROGRAMS[sp] || []);
-  if (related.some((r) => list.some((p) => ciEqual(p, r)))) {
-    return `Related program accepted (${sp})`;
-  }
-  return 'Partial course match';
-}
+  const sc = programScore(profile.program, oppPrograms);
+  const f = fieldScore(profile, opp.field);
+  const lc = locationScore(profile.location, opp.location);
+  const ar = workArrangementScore(profile.work_arrangement, opp.work_arrangement);
 
-function skillsReason(requiredSkills, matchedSkills) {
-  if (!requiredSkills || requiredSkills.length === 0) return 'No required skills specified';
-  if (matchedSkills && matchedSkills.length) {
-    const shown = matchedSkills.slice(0, 4).map(String);
-    return `Skills match: ${shown.join(', ')}${matchedSkills.length > 4 ? '…' : ''}`;
-  }
-  return 'Partial skills overlap';
-}
+  const raw = sc * WEIGHTS.program + f * WEIGHTS.field +
+              lc * WEIGHTS.location + ar * WEIGHTS.arrangement;
+  const scored = clamp(raw * 100);
 
-/**
- * Build the compatibility breakdown between a student profile and one
- * opportunity. Returns a normalized score plus an explainable breakdown.
- */
-function computeMatch(student, opportunity) {
-  const oppPrograms = opportunity.programs || [];
-  const oppSpecs = opportunity.specializations || [];
-  const reqSkills = opportunity.skills || [];
-
-  const sc = courseScore(student.program, oppPrograms);
-  const ss = specializationScore(student.specialization, oppSpecs, oppPrograms);
-  const sk = skillsScore(student.skills, reqSkills);
-  const f  = fieldScore(opportunity.field, student.interests, student.preferred_field);
-  const lc = locationScore(opportunity.location, student.preferred_location, opportunity.work_arrangement);
-  const ar = arrangementScore(opportunity.work_arrangement, student.work_arrangement);
-
-  const total = (sc * WEIGHTS.course) +
-                (ss * WEIGHTS.specialization) +
-                (sk * WEIGHTS.skills) +
-                (f  * WEIGHTS.field) +
-                (lc * WEIGHTS.location) +
-                (ar * WEIGHTS.arrangement);
-
-  // Round only the final displayed value (profile-to-opportunity compatibility,
-  // NOT a prediction of hiring or acceptance).
-  const score = Math.round(total * 100);
-  const clamped = Math.max(0, Math.min(100, score));
-
-  // Explanations: ✓ = strong match, △ = partial match, ✕ = weak/no match
+  /* Explainable "why this matches" checklist */
   const checks = [];
-  if (sc === 1.0) checks.push({ label: 'Your program matches the preferred program', ok: true });
-  else if (sc === 0.5) checks.push({ label: courseReason(student.program, oppPrograms), ok: null });
-  else checks.push({ label: 'Program: not the preferred course for this opening', ok: false });
 
-  if (ss === 1.0) checks.push({ label: 'Exact specialization match', ok: true });
-  else if (ss === 0.5) checks.push({ label: 'Related specialization compatibility', ok: null });
-  else checks.push({ label: 'Specialization not specified or incompatible', ok: false });
-
-  const matchedSkills = (reqSkills || []).filter((r) =>
-    (student.skills || []).some((s) => ciEqual(s, r)));
-
-  if (reqSkills.length === 0) checks.push({ label: 'No required skills specified', ok: null });
-  else if (sk >= 0.75) checks.push({ label: `Your skills match ${Math.round(sk * 100)}% of the required skills`, ok: true });
-  else if (sk > 0) checks.push({ label: `Your skills match ${Math.round(sk * 100)}% of the required skills`, ok: null });
-  else checks.push({ label: 'None of the required skills are on your profile yet', ok: false });
-
-  if (f === 1.0) checks.push({ label: 'Your internship field matches', ok: true });
-  else if (f === 0.75) checks.push({ label: 'Closely related internship field', ok: null });
-  else if (f === 0.5) checks.push({ label: 'Somewhat related internship field', ok: null });
-  else checks.push({ label: 'Internship field differs from your interests', ok: false });
-
-  if (lc === 1.0) checks.push({ label: 'Your preferred location matches', ok: true });
-  else if (lc === 0.75) checks.push({ label: 'Location is nearby your preferred area', ok: null });
-  else if (lc === 0.5) checks.push({ label: 'Remote/hybrid setup makes location flexible', ok: null });
-  else checks.push({ label: 'Location differs from your preference', ok: false });
-
-  if (ar === 1.0) checks.push({ label: 'Work arrangement matches your preference', ok: true });
-  else if (ar === 0.5) checks.push({ label: 'Acceptable alternative work arrangement', ok: null });
-  else checks.push({ label: 'Work arrangement differs from your preference', ok: false });
-
-  // Human-friendly headline reason
-  const parts = [];
-  if (sc >= 0.9) parts.push(`${student.program || 'your program'} program`);
-  if (f >= 0.9 && opportunity.field) parts.push(`${opportunity.field} interest`);
-  if (sk >= 0.6) parts.push(`${matchedSkills.length ? matchedSkills.slice(0, 3).join(', ') + ' skills' : 'strong skills'}`);
-  if (lc >= 0.9 && opportunity.location) parts.push(`${opportunity.location} location`);
-  if (ar >= 0.9 && opportunity.workArrangement) parts.push(`${opportunity.workArrangement.toLowerCase()} preference`);
-
-  let reason;
-  if (parts.length >= 2) {
-    reason = 'Strong profile compatibility based on your ' +
-      (parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1]) + '.';
-  } else if (parts.length === 1) {
-    reason = `Moderate profile compatibility aligned with your ${parts[0]}.`;
+  if (oppPrograms.includes(profile.program)) {
+    checks.push({ label: 'Accepts your selected program', ok: true });
+  } else if (oppPrograms.length === 0) {
+    checks.push({ label: 'Open to all programs (no restricted list)', ok: null });
+  } else if (relatedProgramsFor(profile.program).some((r) => oppPrograms.includes(r))) {
+    checks.push({ label: 'Accepts a closely related program', ok: null });
   } else {
-    reason = 'Based on your profile and the opportunity requirements.';
+    checks.push({ label: 'Your program is not on the preferred list', ok: false });
+  }
+
+  if (opp.field) {
+    if (f >= 1.0) checks.push({ label: 'Relevant ' + opp.field + ' internship', ok: true });
+    else if (f >= 0.7) checks.push({ label: 'Related to ' + opp.field + ' work', ok: null });
+    else checks.push({ label: 'Internship field differs from your program', ok: false });
+  } else {
+    checks.push({ label: 'Internship field not specified', ok: null });
+  }
+
+  if (opp.location) {
+    if (lc >= 0.75) checks.push({ label: 'Located in ' + opp.location, ok: true });
+    else checks.push({ label: 'Located in ' + opp.location, ok: null });
+  }
+
+  if (opp.work_arrangement) {
+    checks.push({ label: opp.work_arrangement + ' arrangement', ok: null });
   }
 
   return {
-    score: clamped,
-    breakdown: { course: sc, specialization: ss, skills: sk, field: f, location: lc, arrangement: ar },
+    score: scored,
+    breakdown: { program: sc, field: f, location: lc, arrangement: ar },
     weights: WEIGHTS,
-    matchedSkills,
     checks,
-    reason,
-    note: 'This score is your profile-to-opportunity compatibility. It is not a prediction of acceptance or hiring.'
+    note: 'This score is program-to-opportunity compatibility for ranking. It is not a prediction of acceptance or hiring.'
   };
 }
 
 module.exports = {
   computeMatch,
   WEIGHTS,
-  courseScore,
-  skillsScore,
+  programScore,
   fieldScore,
-  locationScore,
-  RELATED_PROGRAMS
+  relatedProgramsFor
 };

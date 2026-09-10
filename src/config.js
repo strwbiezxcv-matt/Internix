@@ -48,7 +48,7 @@ const config = {
   port: intFromEnv('PORT', 3000),
   sessionSecret: process.env.SESSION_SECRET || 'internconnect-insecure-local-secret',
   dbPath: path.resolve(ROOT, process.env.DB_PATH || './data/internconnect.db'),
-  seedDemoData: (process.env.SEED_DEMO_DATA || '1') === '1',
+  seedData: !['0', 'false', 'no'].includes((process.env.SEED_DATA || process.env.SEED_DEMO_DATA || '1').toLowerCase()),
   root: ROOT,
   publicDir: path.join(ROOT, 'public')
 };

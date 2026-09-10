@@ -11,18 +11,15 @@
   <!-- ============================== HEADER ============================== -->
   <header class="topbar" id="topbar" hidden>
     <div class="topbar-inner">
-      <a class="brand" href="#" data-nav="home">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 32 32" width="22" height="22"><path d="M16 7l9 5-9 5-9-5 9-5zm-6 9v4c0 1.7 2.7 3 6 3s6-1.3 6-3v-4l-6 3.3L10 16z" fill="currentColor"/></svg>
+      <a class="logo" href="#" data-nav="home">
+        <span class="mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="20" height="20"><path d="M16 7l9 5-9 5-9-5 9-5zm-6 9v4c0 1.7 2.7 3 6 3s6-1.3 6-3v-4l-6 3.3L10 16z" fill="currentColor"/></svg>
         </span>
         Internix
       </a>
-      <nav class="main-nav" id="mainNav"></nav>
-      <div class="topbar-user">
-        <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
+      <nav class="topnav main-nav" id="mainNav"></nav>
+      <div class="spacer"></div>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </header>
 
@@ -30,22 +27,27 @@
   <main id="app"></main>
 
   <!-- ============================== FOOTER ============================== -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <span class="footer-brand">Internix</span>
-      <span>Connecting students with internships, OJT &amp; entry-level opportunities.</span>
+  <footer>
+    <div>
+      <strong>Internix</strong> — Internship discovery &amp; company directory for students.
+    </div>
+    <div style="margin-top:6px;">
+      <a href="#/browse">Internship Opportunities</a>
+      <a href="#/companies">Companies</a>
+      <a href="#/match">Find My Matches</a>
+      <a href="#/about">About</a>
     </div>
   </footer>
 
   <!-- ============================== MODAL ============================== -->
-  <div class="modal-backdrop" id="modalBackdrop" hidden>
+  <div class="modal-overlay" id="modalBackdrop" hidden>
     <div class="modal" id="modal" role="dialog" aria-modal="true">
-      <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+      <button class="close-x" id="modalClose" aria-label="Close">&times;</button>
       <div id="modalContent"></div>
     </div>
   </div>
 
-  <div class="toast-holder" id="toastHolder"></div>
+  <div id="toastHolder"></div>
 
   <script src="/app.js"></script>
 </body>

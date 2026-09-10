@@ -26,7 +26,7 @@ const matchRoutes = require('./routes/matchRoutes');
 db.initSchema();
 
 const programCount = db.get('SELECT COUNT(*) AS c FROM programs').c;
-if (programCount === 0 && config.seedDemoData) {
+if (programCount === 0 && config.seedData) {
   const { seedAll } = require('./seed');
   seedAll();
 }
