@@ -225,9 +225,35 @@ function initSchema() {
   addColumnIfMissing('companies', 'verified_at', 'verified_at TEXT');
   addColumnIfMissing('companies', 'source_name', 'source_name TEXT');
   addColumnIfMissing('companies', 'address', 'address TEXT');
+  addColumnIfMissing('companies', 'internship_status', "internship_status TEXT NOT NULL DEFAULT 'unknown'");
+  addColumnIfMissing('companies', 'internship_notes', 'internship_notes TEXT');
+  addColumnIfMissing('companies', 'barangay', 'barangay TEXT');
+  addColumnIfMissing('companies', 'email', 'email TEXT');
+  addColumnIfMissing('companies', 'phone', 'phone TEXT');
+  addColumnIfMissing('companies', 'last_verified_at', 'last_verified_at TEXT');
+  addColumnIfMissing('companies', 'created_at', 'created_at TEXT');
+  addColumnIfMissing('companies', 'updated_at', 'updated_at TEXT');
+  addColumnIfMissing('companies', 'official_website', 'official_website TEXT');
+  addColumnIfMissing('companies', 'official_website_verified', 'official_website_verified INTEGER NOT NULL DEFAULT 0');
+  addColumnIfMissing('companies', 'source_status', 'source_status TEXT');
+
   addColumnIfMissing('programs', 'description', 'description TEXT');
   addColumnIfMissing('internship_opportunities', 'internship_type', 'internship_type TEXT');
   addColumnIfMissing('internship_opportunities', 'last_verified_at', 'last_verified_at TEXT');
+  addColumnIfMissing('internship_opportunities', 'municipality', 'municipality TEXT');
+  addColumnIfMissing('internship_opportunities', 'city', 'city TEXT');
+  addColumnIfMissing('internship_opportunities', 'province', 'province TEXT');
+  addColumnIfMissing('internship_opportunities', 'region', 'region TEXT');
+  addColumnIfMissing('companies', 'municipality', 'municipality TEXT');
+
+             // --- company_programs junction table (company-level program relevance) ---
+  conn.exec(`CREATE TABLE IF NOT EXISTS company_programs (
+    company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    program_id INTEGER NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
+    relationship_type TEXT NOT NULL DEFAULT 'relevant',
+    PRIMARY KEY (company_id, program_id)
+  );`);
+  addColumnIfMissing('company_programs', 'relationship_type', "relationship_type TEXT NOT NULL DEFAULT 'relevant'");
 }
 
 module.exports = { initSchema, run, get, all, lastInsertId, exec };

@@ -60,6 +60,23 @@ function logoHTML(name, logoUrl) {
 function programNames(list) {
   return (state.catalog ? state.catalog.programs : []).filter((p) => list.includes(p.code)).map((p) => p.name);
 }
+/* ------------------------------ saved companies (localStorage) ------------------------------ */
+const SAVED_CO_KEY = 'internix.savedCompanies';
+function getSavedCompanyIds() {
+  try { return JSON.parse(localStorage.getItem(SAVED_CO_KEY)) || []; } catch { return []; }
+}
+function setSavedCompanyIds(ids) {
+  try { localStorage.setItem(SAVED_CO_KEY, JSON.stringify(ids)); } catch {}
+}
+function isSavedCompany(id) { return getSavedCompanyIds().includes(+id); }
+function toggleSavedCompany(id) {
+  id = +id;
+  let ids = getSavedCompanyIds();
+  if (ids.includes(id)) ids = ids.filter((x) => x !== id);
+  else ids.push(id);
+  setSavedCompanyIds(ids);
+  return ids.includes(id);
+}
 /* ------------------------------ toast & modal ------------------------------ */
 function toast(msg, isErr) {
   const el = document.createElement('div');
@@ -89,13 +106,14 @@ function renderNav() {
   const nav = $('#mainNav');
   const links = [
     ['#/', 'Home'],
-    ['#/browse', 'Internship Opportunities'],
+    ['#/opportunities', 'Internship Opportunities'],
     ['#/companies', 'Companies'],
-    ['#/match', 'Find My Matches'],
+    ['#/find-matches', 'Find My Matches'],
     ['#/about', 'About']
   ];
+  const currentHash = location.hash || '#/';
   nav.innerHTML = links.map(([h, label]) =>
-    '<a href="' + h + '" class="link' + (location.hash === h ? ' active' : '') + '">' + label + '</a>').join('');
+    '<a href="' + h + '" class="link' + (currentHash === h || (h === '#/find-matches' && (currentHash === '#/match' || currentHash === '#/matches')) ? ' active' : '') + '">' + label + '</a>').join('');
   $('#topbar').hidden = false;
 }
 $('#navToggle').addEventListener('click', () => {
@@ -183,6 +201,7 @@ function companyCard(c, index) {
   const progs = (c.relevant_programs || []);
   const progTags = progs.slice(0, 3).map((p) => '<span class="tag">' + esc(p) + '</span>').join('');
   const suffix = (index !== undefined && (index > 7)) ? ' style="order:2"' : '';
+  const saved = isSavedCompany(c.id);
   return '<div class="card company-card" data-cid="' + c.id + '"' + suffix + '>' +
     '<div class="opp-card-top">' + logoHTML(c.company_name, c.logo_url) +
       '<div style="flex:1;min-width:0"><div class="opp-position">' + esc(c.company_name) + '</div>' +
@@ -191,6 +210,7 @@ function companyCard(c, index) {
     '<div class="tag-row" style="margin-bottom:10px">' + availability + progTags + '</div>' +
     '<div class="opp-actions"><button class="btn btn-primary btn-sm" data-cact="view" data-cid="' + c.id + '">View Company</button>' +
       (c.website ? '<a class="btn btn-outline btn-sm" href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">Website</a>' : '') +
+      '<button class="btn btn-ghost btn-sm save-btn" data-cact="save" data-cid="' + c.id + '">' + (saved ? '★' : '☆') + '</button>' +
     '</div></div>';
 }
 
@@ -218,18 +238,15 @@ async function openCompanyDetail(id) {
       '<div class="meta-list">' +
         add('Industry', c.industry) +
         add('Business address', c.address) +
-        add('City', c.city) +
-        add('Province', c.province || c.region) +
-        add('Company size', c.company_size) +
-        add('Year established', c.year_established) +
-        add('Contact information', c.contact_info) +
-        add('Source', c.source_name) +
-        add('Last verified', c.verified_at) +
+        add('Location', loc) +
+        add('Accepted programs', (c.relevant_programs || []).join(', ') || 'Not specified') +
+        add('Internship status', avail) +
       '</div>' +
+      (c.source_url ? '<div style="margin-top:12px"><strong>Verification:</strong> <a href="' + esc(c.source_url) + '" target="_blank" rel="noopener noreferrer">' + esc(c.source_name || 'Official Source') + '</a></div>' : '') +
       (opps.length ? '<h3 style="margin:14px 0 6px">Current internship opportunities</h3><div class="small-opp-list">' + oppList + '</div>' : '') +
       '<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">' +
-        (c.website ? '<a class="btn btn-outline" href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">Official Website</a>' : '') +
-        (c.careers_url ? '<a class="btn btn-outline" href="' + esc(c.careers_url) + '" target="_blank" rel="noopener noreferrer">Careers Page</a>' : '') +
+        (c.source_url ? '<a class="btn btn-primary" href="' + esc(c.source_url) + '" target="_blank" rel="noopener noreferrer">View Official Source</a>' : '') +
+        (c.website ? '<a class="btn btn-outline" href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">Company Website</a>' : '') +
       '</div>'
     );
     $('#modalContent').querySelectorAll('.small-opp').forEach((el) =>
@@ -258,11 +275,11 @@ function landingView() {
         '<div class="prog-bubbles" id="progBubbles">' + progBubbles + '</div>' +
       '</form>' +
       '<div class="hero-cta">' +
-        '<a class="btn btn-outline btn-lg" href="#/browse">Browse All Opportunities</a>' +
+        '<a class="btn btn-outline btn-lg" href="#/opportunities">Browse All Opportunities</a>' +
         '<a class="btn btn-ghost btn-lg" href="#/companies">Explore Companies</a>' +
       '</div>' +
     '</section>' +
-    (featured ? '<section class="section"><div class="section-head"><h2>Featured Internship Opportunities</h2><a class="link" href="#/browse">View all &rarr;</a></div><div class="grid grid-3" id="featuredGrid">' + featured + '</div></section>' : '') +
+    (featured ? '<section class="section"><div class="section-head"><h2>Featured Internship Opportunities</h2><a class="link" href="#/opportunities">View all &rarr;</a></div><div class="grid grid-3" id="featuredGrid">' + featured + '</div></section>' : '') +
     (popCards ? '<section class="section"><div class="section-head"><h2>Popular Companies</h2><a class="link" href="#/companies">Explore all &rarr;</a></div><div class="grid grid-3" id="companyGrid">' + popCards + '</div></section>' : '') +
     '<section class="section" style="margin-top:34px"><div class="section-head"><h2>Browse by Program</h2></div><div class="pills" id="browseByProgram">' + progBubbles + '</div></section>' +
     '<section class="feature-row"><div class="card feature-card"><div class="icon">' + '\u{1F50D}' + '</div><h3>Discover</h3><p>Browse internships and a growing company directory across Bulacan and Metro Manila.</p></div>' +
@@ -275,12 +292,12 @@ function landingView() {
     const code = $('#heroProgram').value;
     if (!code) { toast('Please select your program.', true); return; }
     setStoredProgram(code);
-    go('#/match');
+    go('#/find-matches');
     route();
   };
   $('#heroProgForm').addEventListener('submit', (e) => { e.preventDefault(); runMatch(); });
   $('#progBubbles').querySelectorAll('button[data-prog]').forEach((b) =>
-    b.addEventListener('click', () => { setStoredProgram(b.dataset.prog); go('#/match'); route(); }));
+    b.addEventListener('click', () => { setStoredProgram(b.dataset.prog); go('#/find-matches'); route(); }));
   $('#featuredGrid') && $('#featuredGrid').querySelectorAll('button[data-act]').forEach((b) =>
     b.addEventListener('click', () => openDetail(+b.dataset.id)));
   $('#companyGrid') && $('#companyGrid').querySelectorAll('[data-cact="view"]').forEach((b) =>
@@ -343,7 +360,7 @@ function matchView() {
   });
 }
 function matchesView() {
-  if (!state.results) { go('#/match'); route(); return; }
+  if (!state.results) { go('#/find-matches'); route(); return; }
   const { profile, results } = state.results;
   const progName = profile.program_name || profile.program;
   const card = (r) => {
@@ -435,7 +452,7 @@ async function browseView() {
       const shown = sel && !p ? rows.filter((o) => (o.programs || []).includes(sel)) : rows;
       const list = shown.length ? shown : rows;
       holder.innerHTML = '<div class="section-note" id="browseNote"></div>' + list.map((o) => oppCard(o)).join('');
-      if (shown.length && sel && !p) $('#browseNote').innerHTML = '<span>Showing <strong>' + shown.length + '</strong> opportunities relevant to your selected program. <a href="#/browse">Clear program</a> to see all.</span>';
+      if (shown.length && sel && !p) $('#browseNote').innerHTML = '<span>Showing <strong>' + shown.length + '</strong> opportunities relevant to your selected program. <a href="#/opportunities">Clear program</a> to see all.</span>';
       else if ($('#browseNote')) $('#browseNote').remove();
       bindCards(holder);
     } catch (err) { holder.innerHTML = '<div class="empty">' + esc(err.message) + '</div>'; }
@@ -466,6 +483,14 @@ async function companiesView() {
       if (!list.length) { holder.innerHTML = '<div class="empty">No companies found for these filters.</div>'; return; }
       holder.innerHTML = list.map(card).join('');
       holder.querySelectorAll('[data-cact="view"]').forEach((b) => b.addEventListener('click', () => openCompanyDetail(+b.dataset.cid)));
+      holder.querySelectorAll('[data-cact="save"]').forEach((b) =>
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const on = toggleSavedCompany(+b.dataset.cid);
+          b.classList.toggle('on', on);
+          b.textContent = on ? '★' : '☆';
+          toast(on ? 'Company saved.' : 'Removed from saved.');
+        }));
     };
     const progOpts = (cat ? cat.program_options : []).map((o) => '<option value="' + esc(o.value) + '">' + esc(o.label) + '</option>').join('');
     app.innerHTML =
@@ -482,6 +507,44 @@ async function companiesView() {
     render();
   } catch (err) { app.innerHTML = '<div class="empty">' + esc(err.message) + '</div>'; }
 }
+/* ============================== SAVED COMPANIES ============================== */
+function savedView() {
+  const ids = getSavedCompanyIds();
+  if (!ids.length) {
+    app.innerHTML = '<div class="empty"><div class="empty-icon">&#9733;</div><p>No companies saved yet.</p><p class="hint">Save companies from the Companies page to view them here later.</p></div>';
+    return;
+  }
+  app.innerHTML = '<div class="page-head"><h1>Saved Companies</h1><p class="hint">' + ids.length + ' company' + (ids.length > 1 ? 'ies' : 'y') + ' saved</p></div>';
+  const holder = document.createElement('div');
+  holder.className = 'grid grid-3';
+  holder.id = 'savedGrid';
+  app.appendChild(holder);
+
+  const render = async () => {
+    try {
+      const companies = await api('GET', '/api/companies');
+      const saved = companies.filter((c) => ids.includes(c.id));
+      if (!saved.length) {
+        holder.innerHTML = '<div class="empty">Your saved companies are no longer available.</div>';
+        return;
+      }
+      holder.innerHTML = saved.map((c, i) => companyCard(c, i)).join('');
+      holder.querySelectorAll('[data-cact="view"]').forEach((b) =>
+        b.addEventListener('click', () => openCompanyDetail(+b.dataset.cid)));
+      holder.querySelectorAll('[data-cact="save"]').forEach((b) =>
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const on = toggleSavedCompany(+b.dataset.cid);
+          b.classList.toggle('on', on);
+          b.textContent = on ? '★' : '☆';
+          toast(on ? 'Company saved.' : 'Removed from saved.');
+          savedView();
+        }));
+    } catch (err) { holder.innerHTML = '<div class="empty">' + esc(err.message) + '</div>'; }
+  };
+  render();
+}
+
 /* ============================== ABOUT ============================== */
 function aboutView() {
   const nCompanies = state.companies.length;
@@ -506,10 +569,13 @@ function aboutView() {
 /* ------------------------------ router ------------------------------ */
 const routes = {
   '#/': landingView,
+  '#/opportunities': browseView,
   '#/browse': browseView,
   '#/companies': companiesView,
+  '#/find-matches': matchView,
   '#/match': matchView,
   '#/matches': matchesView,
+  '#/saved': savedView,
   '#/about': aboutView
 };
 
