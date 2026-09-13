@@ -1,0 +1,151 @@
+1 | Accenture Philippines | Metro Manila | web=https://www.accenture.com/ph-en | off=https://www.accenture.com/ph-en | car=https://www.accenture.com/ph-en/careers | src=https://www.accenture.com/ph-en
+2 | Amazon Philippines | Metro Manila | web=https://www.aboutamazon.com | off=https://www.aboutamazon.com | car=https://www.amazon.jobs | src=https://www.aboutamazon.com
+3 | Asia Brewery, Inc. | Bulacan | web=- | off=https://www.asiabrewery.com.ph/ | car=- | src=-
+4 | AXA Philippines | Metro Manila | web=https://www.axa.com.ph | off=https://www.axa.com.ph | car=- | src=https://www.axa.com.ph
+5 | AyalaLand, Inc. | Metro Manila | web=https://www.ayalaland.com.ph | off=https://www.ayalaland.com.ph | car=- | src=https://www.ayalaland.com.ph
+6 | Bank of the Philippine Islands (BPI) | Metro Manila | web=https://www.bpi.com.ph | off=https://www.bpi.com.ph/ | car=https://www.bpi.com.ph/careers | src=https://www.bpi.com.ph
+7 | BDO Unibank, Inc. | Metro Manila | web=https://www.bdo.com.ph | off=https://www.bdo.com.ph | car=https://www.bdo.com.ph/careers | src=https://www.bdo.com.ph
+8 | Capgemini in the Philippines | Metro Manila | web=https://www.capgemini.com | off=https://www.capgemini.com | car=https://www.capgemini.com/careers | src=https://www.capgemini.com
+9 | China Banking Corporation | Metro Manila | web=https://www.chinabank.ph | off=https://www.chinabank.ph | car=https://www.chinabank.ph/careers | src=https://www.chinabank.ph
+10 | Cisco Systems Philippines | Metro Manila | web=https://www.cisco.com | off=https://www.cisco.com | car=https://www.jobs.cisco.com | src=https://www.cisco.com
+11 | Coca-Cola FEMSA Philippines | Metro Manila | web=https://www.coca-colafemsa.com | off=https://www.coca-colafemsa.com | car=https://www.coca-colafemsa.com/ph/careers | src=https://www.coca-colafemsa.com
+12 | Cognizant Technology Solutions | Metro Manila | web=https://www.cognizant.com | off=https://www.cognizant.com | car=https://careers.cognizant.com | src=https://www.cognizant.com
+13 | Concentrix Philippines | Metro Manila | web=https://www.concentrix.com | off=https://www.concentrix.com/ | car=https://www.concentrix.com/careers | src=https://www.concentrix.com
+14 | Dell Technologies Philippines | Metro Manila | web=https://www.dell.com/en-ph | off=https://www.dell.com/en-ph | car=https://www.dell.com/en-ph/careers | src=https://www.dell.com/en-ph
+15 | DENSO TEN Solutions Philippines Corporation | Metro Manila | web=https://www.denso-ten.com | off=https://www.denso-ten.com/ | car=- | src=https://www.denso-ten.com
+16 | EEI Corporation | Metro Manila | web=https://www.eei.com.ph | off=https://www.eei.com.ph | car=- | src=https://www.eei.com.ph
+17 | Globe Telecom (Globe) | Metro Manila | web=https://www.globe.com.ph | off=https://www.globe.com.ph | car=https://www.globe.com.ph/careers | src=https://www.globe.com.ph
+18 | Google Philippines | Metro Manila | web=https://about.google | off=https://about.google | car=https://careers.google.com | src=https://about.google
+19 | Hewlett-Packard (HP) Philippines | Metro Manila | web=https://www.hp.com/ph-en | off=https://www.hp.com/ph-en | car=https://www.hp.com/ph-en/jobs.html | src=https://www.hp.com/ph-en
+20 | IBM Philippines, Inc. | Metro Manila | web=https://www.ibm.com/ph-en | off=https://www.ibm.com/ph-en | car=https://www.ibm.com/careers | src=https://www.ibm.com/ph-en
+21 | Infosys Philippines | Metro Manila | web=https://www.infosys.com | off=https://www.infosys.com/ | car=https://www.infosys.com/careers | src=https://www.infosys.com
+22 | Intel Philippines, Inc. | Metro Manila | web=https://www.intel.com | off=https://www.intel.com | car=https://www.intel.com/content/www/us/en/jobs/careers.html | src=https://www.intel.com
+23 | Jollibee Foods Corporation | Metro Manila | web=https://www.jollibee.com.ph | off=https://www.jollibee.com.ph | car=https://www.jollibee.com.ph/careers | src=https://www.jollibee.com.ph
+24 | Manulife Philippines | Metro Manila | web=https://www.manulife.com.ph | off=https://www.manulife.com.ph | car=https://www.manulife.com.ph/careers | src=https://www.manulife.com.ph
+25 | MERALCO (Manila Electric Company) | Metro Manila | web=https://www.meralco.com.ph | off=https://www.meralco.com.ph | car=https://www.meralco.com.ph/careers | src=https://www.meralco.com.ph
+27 | Microsoft Philippines, Inc. | Metro Manila | web=https://www.microsoft.com/en-ph | off=https://www.microsoft.com/en-ph | car=https://www.microsoft.com/en-ph/careers | src=https://www.microsoft.com/en-ph
+28 | Monde Nissin Corporation | Metro Manila | web=https://www.mondenissin.com | off=https://www.mondenissin.com | car=https://www.mondenissin.com/careers | src=https://www.mondenissin.com
+29 | Mondelez International (Philippines) | Metro Manila | web=https://www.mondelez.com.ph | off=https://www.mondelez.com.ph | car=https://www.mondelez.com/careers | src=https://www.mondelez.com.ph
+30 | Nestle Philippines, Inc. | Metro Manila | web=https://www.nestle.com.ph | off=https://www.nestle.com.ph/ | car=https://www.nestle.com.ph/careers | src=https://www.nestle.com.ph
+31 | Oracle Philippines | Metro Manila | web=https://www.oracle.com/ph | off=https://www.oracle.com/ph/ | car=https://www.oracle.com/careers | src=https://www.oracle.com/ph
+32 | Pepsi-Cola Products Philippines, Inc. | Bulacan | web=- | off=https://www.pepsicophilippines.com/ | car=https://www.pepsicophilippines.com/our-careers | src=-
+33 | Petron Corporation | Metro Manila | web=https://www.petron.com | off=https://www.petron.com | car=https://www.petron.com/careers | src=https://www.petron.com
+34 | Philippine Batteries, Inc. | Bulacan | web=- | off=- | car=- | src=-
+35 | Philippine National Bank (PNB) | Metro Manila | web=- | off=https://www.pnb.com.ph/ | car=- | src=-
+36 | Pilipinas Shell Petroleum Corporation | Metro Manila | web=https://www.shell.com.ph | off=https://www.shell.com.ph | car=- | src=https://www.shell.com.ph
+37 | PLDT Inc. | Metro Manila | web=https://www.pldt.com.ph | off=https://www.pldt.com.ph | car=https://www.pldt.com.ph/careers | src=https://www.pldt.com.ph
+38 | Pru Life UK (Philippine Pru Life Assurance) | Metro Manila | web=https://www.prulifeuk.com.ph | off=https://www.prulifeuk.com.ph | car=https://www.prulifeuk.com.ph/careers | src=https://www.prulifeuk.com.ph
+39 | Rizal Commercial Banking Corporation (RCBC) | Metro Manila | web=https://www.rcbc.com | off=https://www.rcbc.com/ | car=https://www.rcbc.com/careers | src=https://www.rcbc.com
+40 | Robert Bosch, Inc. (Bosch Philippines) | Bulacan | web=https://www.bosch.com.ph | off=https://www.bosch.com.ph | car=https://www.bosch.com.ph/careers | src=https://www.bosch.com.ph
+41 | San Miguel Brewery, Inc. | Bulacan | web=https://www.sanmiguelbrewery.com.ph | off=https://www.sanmiguelbrewery.com.ph | car=- | src=https://www.sanmiguelbrewery.com.ph
+42 | San Miguel Corporation | Metro Manila | web=https://www.sanmiguel.beer.ph | off=https://www.sanmiguel.beer.ph | car=- | src=https://www.sanmiguel.beer.ph
+43 | San Miguel Foods, Inc. | Bulacan | web=- | off=https://www.sanmiguelfoods.com.ph/ | car=- | src=-
+44 | Security Bank Corporation | Metro Manila | web=- | off=https://www.securitybank.com/ | car=- | src=-
+45 | SM Prime Holdings, Inc. | Metro Manila | web=https://www.smprime.com | off=https://www.smprime.com | car=- | src=https://www.smprime.com
+46 | Sun Life of Canada (Philippines) | Metro Manila | web=https://www.sunlife.com.ph | off=https://www.sunlife.com.ph | car=https://www.sunlife.com.ph/careers | src=https://www.sunlife.com.ph
+47 | TaskUs, Inc. | Bulacan | web=https://www.taskus.com | off=https://www.taskus.com | car=https://www.taskus.com/careers | src=https://www.taskus.com
+48 | Tata Consultancy Services Philippines | Metro Manila | web=https://www.tcs.com | off=https://www.tcs.com | car=https://www.tcs.com/careers | src=https://www.tcs.com
+49 | Teleperformance Philippines | Metro Manila | web=https://www.teleperformance.com | off=https://www.teleperformance.com | car=https://www.teleperformance.com/careers | src=https://www.teleperformance.com
+50 | Telus Digital Philippines | Metro Manila | web=https://www.telusdigital.com | off=https://www.telusdigital.com | car=https://www.telusdigital.com/careers | src=https://www.telusdigital.com
+51 | Toyota Motor Philippines Corporation | Metro Manila | web=https://www.toyota.com.ph | off=https://www.toyota.com.ph/ | car=- | src=https://www.toyota.com.ph
+52 | Trend Micro Incorporated | Metro Manila | web=https://www.trendmicro.com | off=https://www.trendmicro.com/ | car=https://www.trendmicro.com/careers | src=https://www.trendmicro.com
+53 | Union Bank of the Philippines (Unionbank) | Metro Manila | web=https://www.unionbankph.com | off=https://www.unionbankph.com/ | car=https://www.unionbankph.com/careers | src=https://www.unionbankph.com
+54 | Universal Robina Corporation (Growers Plant) | Bulacan | web=https://www.urccc.com.ph | off=https://www.urccc.com.ph | car=https://www.urccc.com.ph/careers | src=https://www.urccc.com.ph
+55 | Vitarich Corporation | Bulacan | web=https://www.vitarich.com | off=https://www.vitarich.com | car=- | src=https://www.vitarich.com
+56 | WNS Philippines | Metro Manila | web=https://www.wns.com | off=https://www.wns.com | car=https://www.wns.com/careers | src=https://www.wns.com
+57 | Easecore Software and IT Corp. | Bulacan | web=- | off=- | car=- | src=-
+58 | Webmix Philippines Co. | Bulacan | web=- | off=- | car=- | src=-
+59 | MEDIANETH Software Development Services | Bulacan | web=- | off=- | car=- | src=-
+60 | FbCadCamcom Software Services | Bulacan | web=- | off=- | car=- | src=-
+61 | FDE Engineering Services | Bulacan | web=- | off=- | car=- | src=-
+62 | Perezonic Engineering Services | Bulacan | web=- | off=- | car=- | src=-
+63 | ROCKTECH ENGINEERING SERVICES | Bulacan | web=- | off=- | car=- | src=-
+64 | NWSteel Technologies, Inc. | Bulacan | web=- | off=- | car=- | src=-
+65 | Philform Manufacturing Corporation | Bulacan | web=- | off=- | car=- | src=-
+66 | Wellmade Manufacturing Corporation | Bulacan | web=- | off=- | car=- | src=-
+67 | Fahrenheit, Inc. | Bulacan | web=- | off=- | car=- | src=-
+68 | Rayvill Electrical Construction Corporation | Bulacan | web=- | off=- | car=- | src=-
+69 | Balagtas Tech Solutions | Bulacan | web=- | off=- | car=- | src=-
+70 | Calumpit Industrial Services | Bulacan | web=- | off=- | car=- | src=-
+71 | Marilao Food Processing Co. | Bulacan | web=- | off=- | car=- | src=-
+72 | PixelCraft Studios | Metro Manila | web=- | off=- | car=- | src=-
+73 | DataSync Solutions Philippines | Metro Manila | web=- | off=- | car=- | src=-
+74 | ArchVent Design Studio | Metro Manila | web=- | off=- | car=- | src=-
+75 | BrightLine Electrical Services | Metro Manila | web=- | off=- | car=- | src=-
+76 | GreenLeaf Accounting & Business Services | Metro Manila | web=- | off=- | car=- | src=-
+77 | LogiTrans Supply Chain Solutions | Metro Manila | web=- | off=- | car=- | src=-
+78 | MediCore Equipment Services | Metro Manila | web=- | off=- | car=- | src=-
+79 | BuildRight Construction & Design | Metro Manila | web=- | off=- | car=- | src=-
+80 | VoltEdge Electronics Philippines | Metro Manila | web=- | off=- | car=- | src=-
+81 | PrimePharma Logistics | Metro Manila | web=- | off=- | car=- | src=-
+82 | Nimbustechnologies, Inc. | Metro Manila | web=https://www.nimbus.com.ph/ | off=- | car=- | src=https://www.nimbus.com.ph/
+83 | Metacom | Metro Manila | web=- | off=- | car=- | src=-
+84 | Ramcar Technology Incorporated (Motolite) | Metro Manila | web=https://www.motolite.com | off=https://www.motolite.com/ | car=https://www.motolite.com/careers | src=https://www.motolite.com
+85 | Honda Cars Philippines, Inc. | Metro Manila | web=https://www.hondaphil.com | off=https://www.hondaphil.com/ | car=https://www.hondaphil.com/careers | src=https://www.hondaphil.com/careers
+86 | Toyota Shaw Inc. | Metro Manila | web=- | off=- | car=- | src=-
+87 | Toyota Alabang Inc. | Metro Manila | web=- | off=- | car=- | src=-
+88 | Ford Philippines | Metro Manila | web=- | off=https://www.ford.com.ph/ | car=- | src=-
+89 | Mitsubishi Motors Philippines Corporation | Metro Manila | web=- | off=https://www.mitsubishi-motors.com.ph/ | car=- | src=-
+90 | Nissan Philippines, Inc. | Metro Manila | web=- | off=https://www.nissan.ph/ | car=- | src=-
+91 | Isuzu Philippines Corporation | Metro Manila | web=- | off=https://www.isuzu.com.ph/ | car=- | src=-
+92 | Metropolitan Bank & Trust Company (Metrobank) | Metro Manila | web=https://www.metrobank.com.ph | off=https://www.metrobank.com.ph/ | car=https://www.metrobank.com.ph/careers | src=https://www.metrobank.com.ph
+93 | Land Bank of the Philippines (LANDBANK) | Metro Manila | web=- | off=https://www.landbank.com/ | car=- | src=-
+94 | Development Bank of the Philippines (DBP) | Metro Manila | web=- | off=https://www.dbp.ph/ | car=- | src=-
+95 | EastWest Bank | Metro Manila | web=- | off=- | car=- | src=-
+96 | China Banking Corporation (China Bank) | Metro Manila | web=- | off=https://www.chinabank.ph/ | car=- | src=-
+97 | Maybank Philippines, Inc. | Metro Manila | web=- | off=https://www.maybank.com.ph/ | car=- | src=-
+98 | HSBC Philippines | Metro Manila | web=- | off=https://www.hsbc.com.ph/ | car=- | src=-
+99 | ING Philippines | Metro Manila | web=- | off=https://www.ing.com.ph/ | car=- | src=-
+100 | UBS Philippines | Metro Manila | web=- | off=https://www.ubs.com/ph/ | car=- | src=-
+101 | Helix | Metro Manila | web=- | off=- | car=- | src=-
+102 | Makati Development Corporation (MDC) | Metro Manila | web=https://www.mdc.com.ph/ | off=- | car=https://www.mdc.com.ph/careers | src=https://www.mdc.com.ph/contact-us
+103 | National Irrigation Administration (NIA) | Metro Manila | web=https://www.nia.gov.ph | off=https://www.nia.gov.ph/ | car=https://www.nia.gov.ph/transparency/career-opportunities | src=https://www.nia.gov.ph
+104 | Bradphilsmart | Bulacan | web=- | off=- | car=- | src=-
+105 | Mega Prime Foods, Inc. | Metro Manila | web=- | off=https://www.megaprime.com.ph/ | car=- | src=-
+106 | Eton Properties Philippines Inc. | Metro Manila | web=- | off=https://www.eton.com.ph/ | car=- | src=-
+107 | UMS Group Philippines Inc. | Metro Manila | web=- | off=- | car=- | src=-
+108 | Berde Renewables, Inc. | Metro Manila | web=- | off=https://www.berderenewables.com/ | car=- | src=-
+109 | ES Networks Philippines Inc. | Metro Manila | web=- | off=- | car=- | src=-
+110 | AM Group Kitchen Equipment and Supplies Inc. | Metro Manila | web=- | off=- | car=- | src=-
+111 | Chubb Business Services | Metro Manila | web=- | off=- | car=- | src=-
+112 | PeoplePartners BPO Inc. | Metro Manila | web=- | off=https://www.peoplepartners.ph/ | car=- | src=-
+113 | Omega Healthcare Management Services, Inc. | Metro Manila | web=- | off=- | car=- | src=-
+114 | One Outsource Direct Corporation | Metro Manila | web=- | off=- | car=- | src=-
+115 | Global Transco ICT Solutions | Metro Manila | web=- | off=- | car=- | src=-
+116 | Inquirer Interactive, Inc. | Metro Manila | web=- | off=https://business.inquirer.net/ | car=- | src=-
+117 | FWD Life Insurance Corporation | Metro Manila | web=- | off=https://www.fwd.com.ph/ | car=- | src=-
+118 | General Milling Corporation | Metro Manila | web=- | off=- | car=- | src=-
+119 | Global City Auto Sales (Ford Global City) | Metro Manila | web=- | off=- | car=- | src=-
+120 | Global Electric Transportation (GET) Philippines | Metro Manila | web=- | off=- | car=- | src=-
+121 | Alecto General Technology Corporation | Metro Manila | web=- | off=- | car=- | src=-
+122 | Acceligent Solutions Inc. | Metro Manila | web=- | off=- | car=- | src=-
+123 | I Plus One, Inc. | Metro Manila | web=- | off=- | car=- | src=-
+124 | Inspire Next Global Inc. | Metro Manila | web=- | off=- | car=- | src=-
+125 | Magna Prime Chemical Technologies, Inc. | Bulacan | web=https://magnaprime.com.ph | off=https://magnaprime.com.ph | car=- | src=https://magnaprime.com.ph
+126 | Halla Chem Philippines Inc. | Bulacan | web=- | off=- | car=- | src=-
+127 | JD Foods Corporation | Bulacan | web=https://www.jdfoods.com.ph | off=https://www.jdfoods.com.ph | car=- | src=https://www.jdfoods.com.ph
+128 | Goodyear Container Corporation | Bulacan | web=https://www.goodyearcontainer.com | off=https://www.goodyearcontainer.com | car=- | src=https://www.goodyearcontainer.com
+129 | Bauertek Corp. | Bulacan | web=https://www.bauertek.com | off=https://www.bauertek.com | car=- | src=https://www.bauertek.com
+130 | Pascual Laboratories, Inc. | Bulacan | web=https://www.pascuallab.com | off=https://www.pascuallab.com | car=- | src=https://www.pascuallab.com
+131 | Froneri Philippines, Inc. | Bulacan | web=https://www.froneri.com | off=https://www.froneri.com | car=- | src=https://www.froneri.com
+132 | Fisher Farms, Inc. | Bulacan | web=https://www.fisherfarms.com.ph | off=https://www.fisherfarms.com.ph | car=- | src=https://www.fisherfarms.com.ph
+133 | EASE Technology Solutions, Inc. | Bulacan | web=- | off=- | car=- | src=-
+134 | Eontech Solutions Inc. | Bulacan | web=- | off=- | car=- | src=-
+135 | 3S Offshoring and Outsourcing Inc. | Bulacan | web=- | off=- | car=- | src=-
+136 | ACS Pro Global Corporation | Bulacan | web=- | off=- | car=- | src=-
+137 | DyipPay | Bulacan | web=- | off=- | car=- | src=-
+138 | Jireh Engineering Services | Bulacan | web=- | off=- | car=- | src=-
+139 | H&U Silicone Sealant Manufacturing OPC | Bulacan | web=- | off=- | car=- | src=-
+140 | A. L. Salazar Construction, Inc. | Bulacan | web=- | off=- | car=- | src=-
+141 | Pru Life UK - Baliuag Office | Bulacan | web=https://www.prulifeuk.com.ph | off=https://www.prulifeuk.com.ph | car=- | src=https://www.prulifeuk.com.ph
+142 | Lachicae Curtain Shop | Bulacan | web=- | off=- | car=- | src=-
+143 | Golden Suntec Solutions, Inc. | Metro Manila | web=- | off=- | car=- | src=-
+144 | TeleEye Philippines Inc. | Metro Manila | web=- | off=- | car=- | src=-
+145 | Lightweight Solutions, Inc. | Metro Manila | web=- | off=- | car=- | src=-
+146 | Filmetrics Corporation | Metro Manila | web=- | off=- | car=- | src=-
+147 | Sapient Global Services, Inc. | Metro Manila | web=- | off=- | car=- | src=-
+148 | Rudolf Lietz, Inc. | Metro Manila | web=https://www.lietz.com | off=https://www.lietz.com | car=- | src=https://www.lietz.com
+149 | Toyota Shaw Inc. - Shaw Boulevard Dealership | Metro Manila | web=- | off=- | car=- | src=-
+150 | Hyundai Motor Philippines, Inc. | Metro Manila | web=https://www.hyundai.com.ph | off=https://www.hyundai.com.ph | car=- | src=https://www.hyundai.com.ph
+151 | MDC ConQrete, Inc. - Circuit Makati Plant | Metro Manila | web=https://www.mdc.com.ph/ | off=https://www.mdc.com.ph/ | car=https://www.mdc.com.ph/careers | src=https://www.mdc.com.ph/mdc-conqrete-inc
+152 | MDC Equipment Solutions, Inc. - NLOC Equipment Yard | Metro Manila | web=https://www.mdc.com.ph/ | off=https://www.mdc.com.ph/ | car=https://www.mdc.com.ph/careers | src=https://www.mdc.com.ph/mdc-equipment-solutions-inc

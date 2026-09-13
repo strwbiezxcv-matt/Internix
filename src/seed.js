@@ -292,7 +292,8 @@ function ensureCompany(data) {
         region = ?, industry = ?, contact_info = ?, website = ?, careers_url = ?,
         company_size = ?, year_established = ?, verification_status = ?,
         source_name = ?, source_url = ?, verified_at = ?,
-        internship_status = ?, internship_notes = ?, last_verified_at = ?
+        internship_status = ?, internship_notes = ?, last_verified_at = ?,
+        official_website = COALESCE(official_website, ?)
       WHERE id = ?`,
       data.logo_url || null, data.description,
       data.address || null,
@@ -303,6 +304,7 @@ function ensureCompany(data) {
       data.verification_status || 'unknown',
       data.source_name, data.source_url, data.verified_at || null,
       data.internship_status || 'unknown', data.internship_notes || null, data.last_verified_at || null,
+      data.official_website || data.website || null,
       existing.id
     );
     return existing.id;
@@ -312,8 +314,8 @@ function ensureCompany(data) {
        (company_name, logo_url, description, address, location, city, municipality, province, region,
         industry, contact_info, website, careers_url, company_size, year_established,
         verification_status, source_name, source_url, verified_at,
-        internship_status, internship_notes, last_verified_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        internship_status, internship_notes, last_verified_at, official_website)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     data.company_name, data.logo_url || null, data.description,
     data.address || null,
     (data.location || (data.city ? data.city + ', ' + data.province : data.province || null)),
@@ -322,7 +324,8 @@ function ensureCompany(data) {
     data.company_size || null, data.year_established || null,
     data.verification_status || 'unknown',
     data.source_name, data.source_url, data.verified_at || null,
-    data.internship_status || 'unknown', data.internship_notes || null, data.last_verified_at || null
+    data.internship_status || 'unknown', data.internship_notes || null, data.last_verified_at || null,
+    data.official_website || data.website || null
   ));
 }
 
@@ -391,7 +394,8 @@ function seedCompanies() {
       city: 'Santa Maria',
       province: 'Bulacan',
       description: 'Software and IT services company providing custom software development, web applications, and IT consulting for local and regional clients.',
-      website: null,
+      website: 'https://easecore.com.ph',
+      official_website: 'https://easecore.com.ph',
       careers_url: null,
       company_size: 'Small',
       verification_status: 'needs_review',
@@ -1144,7 +1148,9 @@ function seedOpportunities() {
       verification_status: d.ver,
       internship_type: 'Internship',
       source_name: 'Company listing / careers information',
-      source_url: 'https://www.' + String(d.company).toLowerCase().replace(/[^a-z0-9]+/g, '') + '.com',
+      // Entries may carry their own verified official URL (src); otherwise the
+      // legacy generated placeholder is used.
+      source_url: d.src || ('https://www.' + String(d.company).toLowerCase().replace(/[^a-z0-9]+/g, '') + '.com'),
       programs: d.p,
       specializations: d.spec,
       skills: d.sk

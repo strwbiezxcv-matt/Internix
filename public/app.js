@@ -109,6 +109,7 @@ function renderNav() {
     ['#/opportunities', 'Internship Opportunities'],
     ['#/companies', 'Companies'],
     ['#/find-matches', 'Find My Matches'],
+    ['#/saved', 'Saved'],
     ['#/about', 'About']
   ];
   const currentHash = location.hash || '#/';
@@ -132,8 +133,132 @@ function loadProfile() {
 const PROG_KEY = 'internix.selectedProgram';
 function getStoredProgram() { try { return localStorage.getItem(PROG_KEY); } catch { return null; } }
 function setStoredProgram(code) { try { if (code) localStorage.setItem(PROG_KEY, code); else localStorage.removeItem(PROG_KEY); } catch {} }
-function selectedProgram() { return state.profile ? state.profile.program : (getStoredProgram() || null); }
+function selectedProgram() { return state.profile && state.profile.program ? state.profile.program : (getStoredProgram() || null); }
+function selectedPrograms() {
+  if (state.profile && Array.isArray(state.profile.programs) && state.profile.programs.length) return state.profile.programs.slice();
+  const single = selectedProgram();
+  return single ? [single] : [];
+}
+function programLabel(code) {
+  const o = (state.catalog && state.catalog.program_options || []).find((x) => x.value === code);
+  if (o) return o.label;
+  return code;
+}
+function programLabels(codes) { return (codes || []).map(programLabel); }
+function selectedLocation() { return (state.profile && state.profile.location) || ''; }
+/* Location helpers: strict Bulacan vs Metro Manila separation. */
+function locationLabel(v) { return v || ''; }
+function opportunityLocation(o) {
+  if (o._loc && o._loc.label) return o._loc.label;
+  return o.location || ((o.city ? o.city + ', ' : '') + (o.province || '')) || 'Location not specified';
+}
 /* ------------------------------ shared cards ------------------------------ */
+/* Centralized client-side match helper: ONE implementation used by
+   Find My Matches results, Internship Opportunities, Companies, and
+   Featured lists so every section ranks identically. */
+function clientMatch(o, selectedProgramsArg, selectedLocationArg) {
+  const sel = (selectedProgramsArg || []).filter(Boolean);
+  const oppCodes = (o.programs || []).map(String);
+  const oppNames = (o.program_names || o.relevant_programs || []).map((s) => String(s || '').toLowerCase());
+  let programTier = 'mismatch';
+  if (!sel.length) programTier = 'none';
+  else {
+    const opts = (state.catalog && state.catalog.program_options) || [];
+    const normSel = sel.map(String);
+    const exact = normSel.some((c) => oppCodes.includes(c));
+    if (exact) programTier = 'exact';
+    else {
+      const selNames = opts.filter((x) => normSel.includes(x.value)).map((x) => String(x.label).toLowerCase());
+      const relatedHit = selNames.some((n) => oppNames.some((p) => p === n || p.includes(n) || n.includes(p)));
+      programTier = relatedHit ? 'related' : (oppCodes.length === 0 ? 'open' : 'mismatch');
+    }
+  }
+  let locationOk = true;
+  if (selectedLocationArg) {
+    const want = String(selectedLocationArg).toLowerCase();
+    const hay = String((o.location || '') + ' ' + (o.province || '') + ' ' + (o.city || '') + ' ' + ((o._loc && o._loc.label) || '')).toLowerCase();
+    if (want === 'bulacan') locationOk = hay.includes('bulacan') && !hay.includes('metro manila');
+    else if (want === 'metro manila') locationOk = hay.includes('metro manila') || hay.includes(', metro') || hay.includes('manila') || hay.includes('makati') || hay.includes('quezon city') || hay.includes('pasig') || hay.includes('taguig');
+    else locationOk = hay.includes(want);
+  }
+  return { programTier: programTier, locationOk: locationOk };
+}
+function sameLocationFilter(o, loc) {
+  if (!loc) return true;
+  return clientMatch(o, [], loc).locationOk;
+}
+/* Centralized dropdown option builder (single source of truth). */
+function programOptionsHtml(selected, placeholder) {
+  const opts = (state.catalog && state.catalog.program_options) || [];
+  return '<option value="">' + esc(placeholder || 'Select your program...') + '</option>' +
+    opts.map((o) => '<option value="' + esc(o.value) + '"' + (o.value === selected ? ' selected' : '') + '>' + esc(o.label) + '</option>').join('');
+}
+function locationOptionsHtml(selected, placeholder) {
+  const locs = (state.catalog && state.catalog.locations) || ['Bulacan', 'Metro Manila'];
+  return '<option value="">' + esc(placeholder || 'Select location...') + '</option>' +
+    locs.map((l) => '<option value="' + esc(l) + '"' + (l === selected ? ' selected' : '') + '>' + esc(l) + '</option>').join('');
+}
+function arrangementOptionsHtml(selected) {
+  return '<option value="">Any arrangement</option>' +
+    ARRANGEMENTS.map((a) => '<option value="' + esc(a) + '"' + (a === selected ? ' selected' : '') + '>' + esc(a) + '</option>').join('');
+}
+/* ---------------------- View Details (one consistent modal) ---------------------- */
+function isHttp(u) {
+  return typeof u === 'string' && (u.indexOf('http://') === 0 || u.indexOf('https://') === 0);
+}
+function isWeb(u) {
+  return isHttp(u) || (typeof u === 'string' && u.indexOf('mailto:') === 0);
+}
+function detailLogo(name, url) {
+  if (isHttp(url)) return '<div class="detail-logo"><img src="' + esc(url) + '" alt="" loading="lazy"></div>';
+  return '<div class="detail-logo">' + esc(initials(name)) + '</div>';
+}
+/* Pick ONE best official external link for an internship opportunity. */
+function pickOppLink(o) {
+  const cand = [
+    [o.application_url, 'View Official Application'],
+    [o.source_url, 'View Official Application'],
+    [o.company_careers_url, 'View Official Application'],
+    [o.company_official_website, 'Visit Official Company'],
+    [o.company_website, 'Visit Official Company']
+  ];
+  for (const [u, label] of cand) if (isHttp(u)) return { url: u, label };
+  return null;
+}
+/* Pick ONE best official external link for a company. */
+function pickCompanyLink(c) {
+  const cand = [
+    [c.careers_url, 'View Official Application'],
+    [c.official_website, 'Visit Official Company'],
+    [c.website, 'Visit Official Company'],
+    [c.source_url, 'Visit Official Company']
+  ];
+  for (const [u, label] of cand) if (isHttp(u)) return { url: u, label };
+  if (c.contact_info) {
+    const m = c.contact_info.match(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/i);
+    if (m && m[0]) return { url: 'mailto:' + m[0], label: 'Contact Company' };
+  }
+  return null;
+}
+/* Single, clean detail modal template used everywhere. */
+function detailSheet(o) {
+  const progs = (o.programs || []);
+  const progTags = progs.map((p) => '<span class="tag">' + esc(p) + '</span>').join('');
+  const addressHtml = o.address
+    ? '<div class="detail-address"><span class="d-ico">&#128205;</span><span>' + esc(o.address) + '</span></div>'
+    : '';
+  const cta = (o.href && isWeb(o.href))
+    ? '<a class="btn btn-primary detail-cta" href="' + esc(o.href) + '" target="_blank" rel="noopener noreferrer">' + esc(o.label || 'View Official Application') + ' &#8599;</a>'
+    : '<p class="detail-note">No official application link is available for this listing.</p>';
+  return '<div class="detail-sheet">' +
+    '<div class="detail-head">' + detailLogo(o.name, o.logo) + '<h3 class="detail-name">' + esc(o.name) + '</h3></div>' +
+    (o.title ? '<div class="detail-role">' + esc(o.title) + '</div>' : '') +
+    (o.desc ? '<p class="detail-desc">' + esc(o.desc) + '</p>' : '') +
+    addressHtml +
+    (progs.length ? '<div class="detail-progs"><span class="detail-label">Matched Programs</span><div class="tag-row">' + progTags + '</div></div>' : '') +
+    cta +
+  '</div>';
+}
 function oppCard(o, showScore) {
   const score = (showScore && showScore.score) ? '<div class="match-badge"><div class="pct">' + showScore.score + '%</div><div class="lbl">match</div></div>' : '';
   const progs = (o.programs || []);
@@ -168,29 +293,22 @@ async function openDetail(id) {
   try {
     const d = await api('GET', '/api/opportunities/' + id);
     const o = d.opportunity;
-    const progLabels = (o.program_names && o.program_names.length ? o.program_names
-      : (o.programs || []).map((p) => programNames([p])[0] || p)).map((p) => '<span class="tag">' + esc(p) + '</span>').join('');
-    const skills = (o.skills || []).map((s) => '<span class="tag skill">' + esc(s) + '</span>').join('');
-    const source = o.source_url ? '<a href="' + esc(o.source_url) + '" target="_blank" rel="noopener noreferrer">' + esc(o.source_name || 'Official source') + '</a>' : (o.source_name ? esc(o.source_name) : 'Information not publicly available');
-    openModal(
-      '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:8px">' + logoHTML(o.company_name, o.company_logo) +
-        '<div style="flex:1"><h2>' + esc(o.position) + '</h2><div class="opp-company">' + esc(o.company_name) + '</div></div></div>' +
-      '<p style="margin:8px 0 12px">' + esc(o.description || '') + '</p>' +
-      '<div class="tag-row" style="margin-bottom:14px">' + progLabels + skills + '</div>' +
-      '<div class="meta-list">' +
-        '<div class="row"><span class="k">Location</span><span class="v">' + esc(o.location || 'Information not publicly available') + '</span></div>' +
-        '<div class="row"><span class="k">Work arrangement</span><span class="v">' + esc(o.work_arrangement || 'Information not publicly available') + '</span></div>' +
-        '<div class="row"><span class="k">Eligible programs</span><span class="v">' + esc((o.program_names || []).join(', ') || 'Open to all programs') + '</span></div>' +
-        '<div class="row"><span class="k">Required skills</span><span class="v">' + esc((o.skills || []).join(', ') || 'Not publicly stated') + '</span></div>' +
-        '<div class="row"><span class="k">Source</span><span class="v">' + source + '</span></div>' +
-        '<div class="row"><span class="k">Last verified</span><span class="v">' + fmtDate(o.last_verified_at || o.verified_at) + '</span></div>' +
-      '</div>' +
-      '<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">' +
-        (o.source_url ? '<a class="btn btn-primary" href="' + esc(o.source_url) + '" target="_blank" rel="noopener noreferrer">View Official Application</a>' : '') +
-        (o.company_website ? '<a class="btn btn-outline" href="' + esc(o.company_website) + '" target="_blank" rel="noopener noreferrer">Company Website</a>' : '') +
-      '</div>' +
-      '<p class="hint" style="margin-top:10px;font-size:0.84rem">Application happens on the official external site - Internix does not process applications.</p>'
-    );
+    const progs = (o.program_names && o.program_names.length)
+      ? o.program_names
+      : (o.programs || []).map((p) => programNames([p])[0] || p);
+    const address = o.company_address
+      || (o._loc && o._loc.label ? o._loc.label : (o.location || ''));
+    const link = pickOppLink(o);
+    openModal(detailSheet({
+      name: o.company_name,
+      logo: o.company_logo,
+      title: o.position,
+      desc: o.description,
+      address: address,
+      programs: progs,
+      href: link ? link.url : null,
+      label: link ? link.label : null
+    }));
   } catch (err) { toast(err.message, true); }
 }
 function companyCard(c, index) {
@@ -219,36 +337,32 @@ async function openCompanyDetail(id) {
     const d = await api('GET', '/api/companies/' + id);
     const c = d.company;
     const opps = d.opportunities || [];
-    const progs = d.relevant_program_names || [];
-    const loc = c.location || (c.city ? c.city + ', ' + c.province : (c.province || 'Information not publicly available'));
-    const add = (k, v) => '<div class="row"><span class="k">' + esc(k) + '</span><span class="v">' + esc(v || 'Information not publicly available') + '</span></div>';
-    const avail = opps.length ? (c.has_verified_opening ? 'Internship available' : 'Internship - verify on source') : 'No current verified opening';
-    const oppList = opps.length ? opps.map((o) =>
-      '<div class="small-opp" data-opp="' + o.id + '"><span class="opp-position">' + esc(o.position) + '</span>' +
-      '<div class="opp-meta">' + esc(o.location || '') + (o.work_arrangement ? ' &bull; ' + esc(o.work_arrangement) : '') + '</div></div>').join('') : '';
-    const source = c.source_url ? '<a href="' + esc(c.source_url) + '" target="_blank" rel="noopener noreferrer">' + esc(c.source_name || 'Source') + '</a>' : esc(c.source_name || 'Information not publicly available');
-    openModal(
-      '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:6px">' + logoHTML(c.company_name, c.logo_url) +
-        '<div style="flex:1"><h2>' + esc(c.company_name) + '</h2>' +
-        '<div class="opp-meta">' + esc(c.industry || '') + ' &bull; ' + esc(loc) + '</div></div></div>' +
-      '<p style="margin:8px 0 10px">' + esc(c.description || '') + '</p>' +
-      '<div class="tag-row" style="margin-bottom:12px">' +
-        '<span class="tag">' + esc(avail) + '</span>' +
-        progs.slice(0, 5).map((p) => '<span class="tag">' + esc(p) + '</span>').join('') + '</div>' +
-      '<div class="meta-list">' +
-        add('Industry', c.industry) +
-        add('Business address', c.address) +
-        add('Location', loc) +
-        add('Accepted programs', (c.relevant_programs || []).join(', ') || 'Not specified') +
-        add('Internship status', avail) +
-      '</div>' +
-      (c.source_url ? '<div style="margin-top:12px"><strong>Verification:</strong> <a href="' + esc(c.source_url) + '" target="_blank" rel="noopener noreferrer">' + esc(c.source_name || 'Official Source') + '</a></div>' : '') +
-      (opps.length ? '<h3 style="margin:14px 0 6px">Current internship opportunities</h3><div class="small-opp-list">' + oppList + '</div>' : '') +
-      '<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">' +
-        (c.source_url ? '<a class="btn btn-primary" href="' + esc(c.source_url) + '" target="_blank" rel="noopener noreferrer">View Official Source</a>' : '') +
-        (c.website ? '<a class="btn btn-outline" href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">Company Website</a>' : '') +
-      '</div>'
-    );
+    const progs = (d.relevant_program_names && d.relevant_program_names.length)
+      ? d.relevant_program_names
+      : (c.relevant_programs || []);
+    const address = c.address
+      || c.location
+      || (c.city ? c.city + ', ' + c.province : (c.province || ''));
+    const link = pickCompanyLink(c);
+    const title = opps.length === 1 ? opps[0].position
+      : (opps.length > 1 ? 'Internship / OJT opportunities available' : '');
+    const oppRows = opps.length
+      ? '<div class="detail-openings"><span class="detail-label">Current Openings</span><div class="small-opp-list">' +
+        opps.map((o) => '<div class="small-opp" data-opp="' + o.id + '">' +
+          '<span class="opp-position">' + esc(o.position) + '</span>' +
+          '<span class="d-chevy">&#8250;</span></div>').join('') +
+        '</div></div>'
+      : '';
+    openModal(detailSheet({
+      name: c.company_name,
+      logo: c.logo_url,
+      title: title,
+      desc: (c.description || '').slice(0, 320),
+      address: address,
+      programs: progs,
+      href: link ? link.url : null,
+      label: link ? link.label : null
+    }) + oppRows);
     $('#modalContent').querySelectorAll('.small-opp').forEach((el) =>
       el.addEventListener('click', () => openDetail(+el.dataset.opp)));
   } catch (err) { toast(err.message, true); }
@@ -257,12 +371,13 @@ async function openCompanyDetail(id) {
 function landingView() {
   const options = state.catalog ? (state.catalog.program_options || []) : [];
   const sel = selectedProgram();
-  const opt = (o) => '<option value="' + esc(o.value) + '"' + (o.value === sel ? ' selected' : '') + '>' + esc(o.label) + '</option>';
   const progBubbles = options.slice(0, 10).map((o) =>
     '<button type="button" class="prog-bubble" data-prog="' + esc(o.value) + '">' + esc(o.label) + '</button>').join('');
   const featured = state.opps.slice(0, 3).map((o) => oppCard(o)).join('');
   const popCos = state.companies.slice(0, 6);
   const popCards = popCos.map((c, i) => companyCard(c, i)).join('');
+  const locs = (state.catalog && state.catalog.locations) || ['Bulacan', 'Metro Manila'];
+  const savedLoc = selectedLocation();
 
   app.innerHTML =
     '<section class="hero">' +
@@ -270,9 +385,9 @@ function landingView() {
       '<p class="hero-sub">Explore internship opportunities and companies across Bulacan and Metro Manila based on your academic program. Browse freely, discover companies, and visit official sources to apply - no account needed.</p>' +
       '<form class="hero-program-form" id="heroProgForm">' +
         '<label for="heroProgram">Which program are you taking?</label>' +
-        '<div class="hero-select-row"><select id="heroProgram" class="hero-select"><option value="">Select your program...</option>' + options.map(opt).join('') + '</select>' +
+        '<div class="hero-select-row"><select id="heroProgram" class="hero-select">' + programOptionsHtml(sel, 'Select your program...') + '</select>' +
         '<button class="btn btn-primary btn-lg" type="submit">Find My Matches</button></div>' +
-        '<div class="prog-bubbles" id="progBubbles">' + progBubbles + '</div>' +
+        '<div class="hero-select-row" style="margin-top:10px"><select id="heroLocation" class="hero-select" aria-label="Preferred location">' + locationOptionsHtml(savedLoc, 'Anywhere (Bulacan + Metro Manila)') + '</select></div>' +
       '</form>' +
       '<div class="hero-cta">' +
         '<a class="btn btn-outline btn-lg" href="#/opportunities">Browse All Opportunities</a>' +
@@ -291,11 +406,19 @@ function landingView() {
   const runMatch = () => {
     const code = $('#heroProgram').value;
     if (!code) { toast('Please select your program.', true); return; }
+    const loc = $('#heroLocation') ? $('#heroLocation').value : '';
+    const profile = { programs: [code], program: code, specialization: null, location: loc || null, work_arrangement: null };
+    saveProfile(profile);
     setStoredProgram(code);
     go('#/find-matches');
     route();
   };
   $('#heroProgForm').addEventListener('submit', (e) => { e.preventDefault(); runMatch(); });
+  const heroLoc = $('#heroLocation');
+  if (heroLoc) heroLoc.addEventListener('change', (e) => {
+    const cur = state.profile || {};
+    saveProfile({ programs: cur.programs, program: cur.program, specialization: cur.specialization || null, location: e.target.value || null, work_arrangement: cur.work_arrangement || null });
+  });
   $('#progBubbles').querySelectorAll('button[data-prog]').forEach((b) =>
     b.addEventListener('click', () => { setStoredProgram(b.dataset.prog); go('#/find-matches'); route(); }));
   $('#featuredGrid') && $('#featuredGrid').querySelectorAll('button[data-act]').forEach((b) =>
@@ -309,45 +432,52 @@ function matchView() {
   if (!cat) { app.innerHTML = '<div class="empty skeleton">Loading...</div>'; return; }
   const p = state.profile || {};
   const options = cat.program_options || [];
-  const sel = p.program || getStoredProgram() || '';
-  const selLabel = sel ? (cat.program_options.find((o) => o.value === sel) || {}).label : null;
+  const stored = p.programs || (p.program ? [p.program] : null) || (getStoredProgram() ? [getStoredProgram()] : []);
   const locSel = p.location || '';
   const locOpts = (cat.locations || []).map((l) =>
     '<option value="' + esc(l) + '" ' + (l === locSel ? 'selected' : '') + '>' + esc(l) + '</option>').join('');
   const arrOpts = ARRANGEMENTS.map((a) =>
     '<option value="' + esc(a) + '" ' + (a === p.work_arrangement ? 'selected' : '') + '>' + esc(a) + '</option>').join('');
+  const checks = options.map((o) =>
+    '<label class="prog-check' + (stored.includes(o.value) ? ' on' : '') + '"><input type="checkbox" name="matchProg" value="' + esc(o.value) + '"' + (stored.includes(o.value) ? ' checked' : '') + '><span class="check-box" aria-hidden="true"></span><span>' + esc(o.label) + '</span></label>').join('');
 
   app.innerHTML =
-    '<div class="page-head"><h1>Find My Matches</h1></div>' +
-    '<div class="card" style="max-width:760px">' +
+    '<div class="page-head"><h1>Find My Matches</h1><p class="page-sub">Select your program(s) and location. Internix ranks opportunities by program compatibility (50%), location (25%), role relevance (15%) and skills fit (10%) — never random.</p></div>' +
+    '<div class="card card-narrow">' +
     '<form id="matchForm">' +
-      '<div class="field"><label for="progSelect">Which program are you taking?</label>' +
-        '<select id="progSelect" class="select-lg" required><option value="">Select your program...</option>' +
-        options.map((o) => '<option value="' + esc(o.value) + '" ' + (o.value === sel ? 'selected' : '') + '>' + esc(o.label) + '</option>').join('') +
-        '</select></div>' +
-      '<div class="form-row">' +
-        '<div class="field"><label for="locSelect">Preferred location <span class="hint">(optional)</span></label>' +
-          '<select id="locSelect"><option value="">Anywhere</option>' + locOpts + '</select></div>' +
+      '<div class="field"><span class="field-label" id="progLabel">Programs <span class="hint">(select one or more)</span></span>' +
+        '<div class="prog-check-grid" role="group" aria-labelledby="progLabel">' + checks + '</div></div>' +
+      '<div class="form-row" style="margin-top:14px">' +
+        '<div class="field"><label for="locSelect">Location</label>' +
+          '<select id="locSelect"><option value="">Anywhere (Bulacan + Metro Manila)</option>' + locOpts + '</select></div>' +
         '<div class="field"><label for="arrSelect">Work arrangement <span class="hint">(optional)</span></label>' +
           '<select id="arrSelect"><option value="">Any</option>' + arrOpts + '</select></div>' +
       '</div>' +
-      '<button class="btn btn-primary btn-block btn-lg" type="submit">Find My Matches</button>' +
-      '<p class="hint" style="margin-top:8px">Only your program is required. Location and work arrangement are optional refinements. Scores reflect program-to-opportunity compatibility for ranking - not a guarantee of hiring.</p>' +
-    '</form></div>' +
-    (selLabel ? '<p class="hint" style="margin-top:12px">Currently selected: <strong>' + esc(selLabel) + '</strong></p>' : '');
+      '<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button class="btn btn-primary btn-block btn-lg" type="submit" style="flex:1;min-width:220px">Find My Matches</button>' +
+      '<button class="btn btn-ghost btn-lg" type="button" id="matchClear">Clear</button></div>' +
+      '<p class="hint" style="margin-top:8px">Program fit counts most. Bulacan and Metro Manila are matched separately — selecting one never returns the other. Match % reflects real criteria, not random values.</p>' +
+    '</form></div>';
 
+  $('#matchForm').querySelectorAll('.prog-check input').forEach((cb) =>
+    cb.addEventListener('change', () => cb.closest('.prog-check').classList.toggle('on', cb.checked)));
+  $('#matchClear').addEventListener('click', () => {
+    $('#matchForm').querySelectorAll('.prog-check input').forEach((cb) => { cb.checked = false; cb.closest('.prog-check').classList.remove('on'); });
+    $('#locSelect').value = ''; $('#arrSelect').value = '';
+  });
   $('#matchForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const code = $('#progSelect').value;
-    if (!code) { toast('Please select your program.', true); return; }
+    const codes = Array.from($('#matchForm').querySelectorAll('.prog-check input:checked')).map((cb) => cb.value);
+    if (!codes.length) { toast('Please select at least one program.', true); return; }
     const profile = {
-      program: code,
+      programs: codes,
+      program: codes[0],
       specialization: null,
       location: $('#locSelect').value || null,
       work_arrangement: $('#arrSelect').value || null
     };
     saveProfile(profile);
-    setStoredProgram(code);
+    setStoredProgram(codes[0]);
+    try { localStorage.setItem('internix.selectedPrograms', JSON.stringify(codes)); } catch {}
     app.innerHTML = '<div class="empty skeleton">Finding your internship matches...</div>';
     try {
       const d = await api('POST', '/api/match', profile);
@@ -362,12 +492,13 @@ function matchView() {
 function matchesView() {
   if (!state.results) { go('#/find-matches'); route(); return; }
   const { profile, results } = state.results;
-  const progName = profile.program_name || profile.program;
+  const progNames = profile.program_names || (profile.program_name ? [profile.program_name] : (profile.program ? [profile.program] : []));
+  const locName = profile.location || (profile.location_resolved && (profile.location_resolved.municipality || profile.location_resolved.province)) || '';
   const card = (r) => {
     const o = r.opportunity;
     const checks = (r.match.checks || []).map((c) =>
       '<li class="' + (c.ok === true ? 'ok' : c.ok === false ? 'no' : 'part') + '">' +
-      (c.ok === true ? '\u2713' : c.ok === false ? '\u2717' : '\u25B3') + ' ' + esc(c.label) + '</li>').join('');
+      (c.ok === true ? '✓' : c.ok === false ? '✗' : '△') + ' ' + esc(c.label) + '</li>').join('');
     const where = o.location ? '<div class="opp-meta">' + esc(o.location) + '</div>' : '';
     const progs = (o.program_names || []).slice(0, 2).map((p) => '<span class="tag">' + esc(p) + '</span>').join('');
     const source = o.source_url ? '<a class="btn btn-outline btn-sm" href="' + esc(o.source_url) + '" target="_blank" rel="noopener noreferrer">View Official Source</a>' : '';
@@ -383,40 +514,54 @@ function matchesView() {
   };
   app.innerHTML =
     '<div class="page-head"><h1>Your Internship Matches</h1>' +
-      '<p>Based on your selected program: <strong>' + esc(progName) + '</strong>.' +
+      '<p>Based on your selected program' + (progNames.length > 1 ? 's' : '') + ': <strong>' + esc(progNames.join(' + ')) + '</strong>' +
+      (locName ? ' in <strong>' + esc(locName) + '</strong>' : '') + '.' +
       ' Scores are program-to-opportunity compatibility for ranking - they do not predict acceptance or hiring.</p></div>' +
     '<div class="match-summary" id="matchSummary"></div>' +
-    '<div class="section"><div id="matchResults" class="match-list"></div></div>';
-  const render = () => {
-    const q = ($('#matchQ') ? $('#matchQ').value : '').trim().toLowerCase();
-    const list = results.filter((r) =>
-      !q || (r.opportunity.position + ' ' + r.opportunity.company_name + ' ' + (r.opportunity.description || '')).toLowerCase().includes(q));
-    const summary = '<form class="filter-bar" id="matchFilter" style="grid-template-columns:2fr 1fr 1fr auto">' +
-      '<div class="field q-field"><label>Search</label><input type="text" id="matchQ" placeholder="Position, company, keyword..." value=""></div>' +
-      '<div class="field"><label>Location</label><select id="matchLoc"><option value="">Any</option>' + (state.catalog.locations || []).map((l) => '<option>' + esc(l) + '</option>').join('') + '</select></div>' +
-      '<div class="field"><label>Arrangement</label><select id="matchArr"><option value="">Any</option>' + ARRANGEMENTS.map((a) => '<option>' + esc(a) + '</option>').join('') + '</select></div>' +
-      '</form>';
-    $('#matchSummary').innerHTML = summary;
-    const loc = $('#matchLoc').value;
-    const arr = $('#matchArr').value;
-    const filtered = list.filter((r) => {
+    '<div class="section"><div class="result-count" id="matchCount"></div><div id="matchResults" class="match-list"></div></div>';
+  const filters = { q: '', loc: '', arr: '' };
+  const applyFilters = () => {
+    const q = filters.q.trim().toLowerCase();
+    return (results || []).filter((r) => {
       const o = r.opportunity;
-      if (loc && !(o.location || '').toLowerCase().includes(loc.toLowerCase())) return false;
-      if (arr && (o.work_arrangement || '') !== arr) return false;
+      if (q && !((o.position || '') + ' ' + (o.company_name || '') + ' ' + (o.description || '')).toLowerCase().includes(q)) return false;
+      if (filters.loc && !((o.location || '') + ' ' + ((o._loc && o._loc.label) || '')).toLowerCase().includes(filters.loc.toLowerCase())) return false;
+      if (filters.arr && (o.work_arrangement || '') !== filters.arr) return false;
       return true;
     });
+  };
+  const paint = () => {
     const holder = $('#matchResults');
-    if (!filtered.length) { holder.innerHTML = '<div class="empty">No matches found. Adjust your program or <a href="#/match">update your details</a>.</div>'; return; }
-    holder.innerHTML = filtered.map(card).join('');
+    const count = $('#matchCount');
+    const filtered = applyFilters();
+    // Dedupe: one card per opportunity id.
+    const seen = new Set();
+    const unique = filtered.filter((r) => {
+      const id = r.opportunity && r.opportunity.id;
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+    if (count) count.innerHTML = 'Showing <strong>' + unique.length + '</strong> of <strong>' + results.length + '</strong> matched opportunit' + (results.length === 1 ? 'y' : 'ies');
+    if (!unique.length) { holder.innerHTML = '<div class="empty">No matches found. Adjust your program or <a href="#/find-matches">update your details</a>.</div>'; return; }
+    holder.innerHTML = unique.map(card).join('');
     holder.querySelectorAll('[data-act="view"]').forEach((b) => b.addEventListener('click', () => openDetail(+b.dataset.id)));
+  };
+  const render = () => {
+    $('#matchSummary').innerHTML = '<form class="filter-bar" id="matchFilter" style="grid-template-columns:2fr 1fr 1fr auto">' +
+      '<div class="field q-field"><label>Search</label><input type="text" id="matchQ" placeholder="Position, company, keyword..." value="' + esc(filters.q) + '"></div>' +
+      '<div class="field"><label>Location</label><select id="matchLoc"><option value="">Any</option>' + (state.catalog.locations || []).map((l) => '<option' + (filters.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' +
+      '<div class="field"><label>Arrangement</label><select id="matchArr"><option value="">Any</option>' + ARRANGEMENTS.map((a) => '<option' + (filters.arr === a ? ' selected' : '') + '>' + esc(a) + '</option>').join('') + '</select></div>' +
+      '<div class="field field-actions"><button class="btn btn-ghost btn-sm" type="button" id="matchClearBtn">Clear</button></div>' +
+      '</form>';
+    $('#matchQ').addEventListener('input', (e) => { filters.q = e.target.value; paint(); });
+    $('#matchLoc').addEventListener('change', (e) => { filters.loc = e.target.value; paint(); });
+    $('#matchArr').addEventListener('change', (e) => { filters.arr = e.target.value; paint(); });
+    $('#matchClearBtn').addEventListener('click', () => { filters.q = ''; filters.loc = ''; filters.arr = ''; render(); paint(); });
+    paint();
   };
   $('#matchSummary').innerHTML = '<div class="empty skeleton">Loading...</div>';
   render();
-  setTimeout(() => {
-    const q = $('#matchQ'); if (q) q.addEventListener('input', render);
-    const loc = $('#matchLoc'); if (loc) loc.addEventListener('change', render);
-    const arr = $('#matchArr'); if (arr) arr.addEventListener('change', render);
-  }, 0);
 }
 /* ============================== BROWSE OPPORTUNITIES ============================== */
 async function browseView() {
@@ -473,10 +618,18 @@ async function companiesView() {
     const card = (c, i) => companyCard(c, i);
     const render = () => {
       const q = filter.q.trim().toLowerCase();
+      const progObj = filter.program ? (cat ? (cat.program_options || []).find((o) => o.value === filter.program) : null) : null;
+      const progLabel = progObj ? String(progObj.label).toLowerCase() : '';
       const list = state.companies.filter((c) => {
         if (q && !(c.company_name + ' ' + (c.industry || '') + ' ' + (c.description || '') + ' ' + (c.city || '') + ' ' + (c.relevant_programs || []).join(' ')).toLowerCase().includes(q)) return false;
         if (filter.province && ((c.province || '') || (c.region || '')) !== filter.province) return false;
-        if (filter.program && !(c.relevant_programs || []).includes(filter.program)) return false;
+        if (filter.program) {
+          const names = (c.relevant_programs || []).map((s) => String(s).toLowerCase());
+          const codes = (c.relevant_program_codes || []).map(String);
+          const byName = progLabel && names.some((n) => n === progLabel || n.includes(progLabel) || progLabel.includes(n));
+          const byCode = codes.includes(filter.program);
+          if (!byName && !byCode) return false;
+        }
         return true;
       });
       const holder = $('#companyGrid');

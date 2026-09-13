@@ -1,0 +1,2 @@
+﻿open opps: 61 | with company official link: 36
+companies: 151 | with official_website: 93

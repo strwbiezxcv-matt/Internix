@@ -35,9 +35,16 @@ function upsertCompany(d) {
     d.internship_status, d.internship_notes || null, TODAY];
   if (ex) {
     db.run('UPDATE companies SET logo_url=?,description=?,address=?,location=?,city=?,municipality=?,province=?,region=?,industry=?,contact_info=?,website=?,careers_url=?,company_size=?,year_established=?,verification_status=?,source_name=?,source_url=?,verified_at=?,internship_status=?,internship_notes=?,last_verified_at=? WHERE id=?', ...args, ex.id);
+    if (d.website || d.official_website) {
+      db.run('UPDATE companies SET official_website = COALESCE(official_website, ?) WHERE id = ?', d.official_website || d.website, ex.id);
+    }
     return ex.id;
   }
-  return db.lastInsertId(db.run('INSERT INTO companies (company_name,logo_url,description,address,location,city,municipality,province,region,industry,contact_info,website,careers_url,company_size,year_established,verification_status,source_name,source_url,verified_at,internship_status,internship_notes,last_verified_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', d.company_name, ...args));
+  const newId = db.lastInsertId(db.run('INSERT INTO companies (company_name,logo_url,description,address,location,city,municipality,province,region,industry,contact_info,website,careers_url,company_size,year_established,verification_status,source_name,source_url,verified_at,internship_status,internship_notes,last_verified_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', d.company_name, ...args));
+  if (d.website || d.official_website) {
+    db.run('UPDATE companies SET official_website = COALESCE(official_website, ?) WHERE id = ?', d.official_website || d.website, newId);
+  }
+  return newId;
 }
 function linkCP(name, city, codes) {
   const c = findCompany(name, city || null);
@@ -90,12 +97,14 @@ function seedBatchA() {
     source_name: 'Official company website (nimbus.com.ph)', source_url: 'https://www.nimbus.com.ph/',
     internship_status: POTENTIAL, internship_notes: 'IT solutions provider suitable for IT/Computer Engineering OJT. No internship-specific posting verified on the official site - do not assume openings.' });
   linkCP('Nimbustechnologies, Inc.', ['BSIT', 'COMPUTER ENGINEERING']);
-  upsertCompany({ company_name: 'Metacom', industry: 'BPO / Business Services',
-    city: null, province: 'Metro Manila', description: 'Metacom / Metacom BPO - legitimate BPO/business-services company with recruitment presence; no internship-specific opening verified.',
-    website: null, careers_url: null, verification_status: 'needs_review',
-    source_name: 'User-requested company - careers presence noted, internship not verified', source_url: null,
+  upsertCompany({ company_name: 'Metacom BPO', industry: 'BPO / Business Services',
+    city: 'Baliwag', province: 'Bulacan', municipality: 'Baliwag',
+    location: 'Baliwag, Bulacan',
+    description: 'Metacom BPO - legitimate BPO/business-services company in Baliwag, Bulacan; no internship-specific opening verified.',
+    website: 'https://metacombpo.com', careers_url: null, verification_status: 'needs_review',
+    source_name: 'Official company website (metacombpo.com)', source_url: 'https://metacombpo.com',
     internship_status: POTENTIAL, internship_notes: 'Active recruitment presence noted; no internship/OJT-specific evidence found, so Potential Internship Host.' });
-  linkCP('Metacom', null, []);
+  linkCP('Metacom BPO', 'Baliwag', []);
   upsertCompany({ company_name: 'Ramcar Technology Incorporated (Motolite)', industry: 'Automotive / Battery / Manufacturing / Technology',
     address: 'Ramcar Center, 80-82 Roces Ave., Diliman, Quezon City', city: 'Quezon City', province: 'Metro Manila',
     description: 'Ramcar Technology Incorporated - manufacturer of Motolite batteries (motolite.com). Official careers page publishes an Industrial Engineer Intern posting with an Internship job filter.',
@@ -221,25 +230,26 @@ function seedBatchD() {
     internship_status: POTENTIAL, internship_notes: 'Equipment operations & maintenance site relevant to Automotive Technology, Electrical Technology and Industrial Engineering OJT. No internship-specific posting verified - do not assume openings.' });
   linkCP('MDC Equipment Solutions, Inc. - NLOC Equipment Yard', ['AUTOMOTIVE TECHNOLOGY', 'ELECTRICAL TECHNOLOGY', 'INDUSTRIAL ENGINEERING', 'COMPUTER ENGINEERING']);
   upsertCompany({ company_name: 'National Irrigation Administration (NIA)', industry: 'Government / Engineering / Infrastructure',
-    address: 'EDSA, Diliman, Quezon City', city: 'Quezon City', province: 'Metro Manila',
-    description: 'National Irrigation Administration - government agency at EDSA, Diliman, Quezon City (nia.gov.ph). Official site lists career opportunities; no student internship/OJT-specific posting verified.',
-    website: 'https://www.nia.gov.ph', careers_url: 'https://www.nia.gov.ph/transparency/career-opportunities', verification_status: 'verified',
-    source_name: 'Official Government Website (https://www.nia.gov.ph)', source_url: 'https://www.nia.gov.ph',
+    address: 'San Rafael, Bulacan', city: 'San Rafael', province: 'Bulacan', municipality: 'San Rafael',
+    location: 'San Rafael, Bulacan',
+    description: 'National Irrigation Administration (NIA) - government agency; Region 3 office in San Rafael, Bulacan (region3.nia.gov.ph). Official site lists career opportunities; no student internship/OJT-specific posting verified.',
+    website: 'https://region3.nia.gov.ph', careers_url: null, verification_status: 'verified',
+    source_name: 'Official Government Website (https://region3.nia.gov.ph)', source_url: 'https://region3.nia.gov.ph',
     internship_status: POTENTIAL, internship_notes: 'No student internship/OJT-specific evidence found; potential host only.' });
 }
 function seedBatchE() {
-  upsertCompany({ company_name: 'Bradphilsmart', industry: 'Unknown - verification required',
+  upsertCompany({ company_name: 'BradSmart Phils.Co', industry: 'Unknown - verification required',
     city: null, province: 'Bulacan', municipality: 'Santa Maria',
     location: 'Santa Maria, Bulacan',
-    description: 'Bradphilsmart - reported in Santa Maria, Bulacan; exact company could not be publicly verified. No address, opening, website, or program fabricated.',
-    website: null, careers_url: null, verification_status: 'needs_review',
-    source_name: 'User-requested company - exact identity pending verification', source_url: null,
+    description: 'BradSmart Phils.Co - reported in Santa Maria, Bulacan. Official website: https://ibradsmartphilsco.com. No opening or program fabricated.',
+    website: 'https://ibradsmartphilsco.com', careers_url: null, verification_status: 'needs_review',
+    source_name: 'Official company website (ibradsmartphilsco.com)', source_url: 'https://ibradsmartphilsco.com',
     internship_status: NEEDS, internship_notes: 'Exact company could not be publicly verified.' });
   const list = [
     ['Mega Prime Foods, Inc.', 'Quezon City', 'Food Manufacturing'],
     ['Eton Properties Philippines Inc.', 'Makati', 'Real Estate / Property'],
     ['UMS Group Philippines Inc.', 'Quezon City', 'Technology / Business Services'],
-    ['Berde Renewables, Inc.', 'Mandaluyong', 'Renewable Energy'],
+    ['Berde Renewables, Inc.', 'Mandaluyong', 'Renewable Energy', 'https://berderenewables.com'],
     ['ES Networks Philippines Inc.', 'Makati', 'Technology / Networking'],
     ['AM Group Kitchen Equipment and Supplies Inc.', 'Makati', 'Kitchen Equipment / Supplies'],
     ['Chubb Business Services', 'Mandaluyong', 'Insurance / Business Services'],
@@ -252,17 +262,20 @@ function seedBatchE() {
     ['General Milling Corporation', null, 'Food / Manufacturing'],
     ['Global City Auto Sales (Ford Global City)', 'Taguig', 'Automotive Dealership'],
     ['Global Electric Transportation (GET) Philippines', null, 'Electric Transportation / Mobility'],
-    ['Alecto General Technology Corporation', null, 'Technology'],
-    ['Acceligent Solutions Inc.', null, 'Technology / Solutions'],
+    ['Alecto General Technology Corporation', 'Makati', 'Technology', 'https://alecto.com.ph'],
+    ['Acceligent Solutions Inc.', null, 'Technology / Solutions', 'https://acceligent.com.ph'],
     ['I Plus One, Inc.', null, 'Technology / Business Services'],
     ['Inspire Next Global Inc.', null, 'Consulting / Technology']];
-  for (const [n, city, ind] of list) {
+  for (const [n, city, ind, website] of list) {
     upsertCompany({ company_name: n, industry: ind, city, province: 'Metro Manila',
       description: n + ' - legitimate Metro Manila company; no verified current internship/OJT posting, so Potential Internship Host.',
-      website: null, careers_url: null, verification_status: 'needs_review',
-      source_name: 'User-requested company - internship not verified', source_url: null,
+      website: website || null, careers_url: null, verification_status: 'needs_review',
+      source_name: website ? 'Official company website (' + website.replace(/^https?:\/\//, '') + ')' : 'User-requested company - internship not verified',
+      source_url: website || null,
       internship_status: POTENTIAL, internship_notes: 'No verified current internship opening.' });
   }
+  // Berde Renewables, Inc. - requested program mapping (added to existing list).
+  linkCP('Berde Renewables, Inc.', 'Mandaluyong', ['INDUSTRIAL ENGINEERING', 'COMPUTER ENGINEERING', 'COMPUTER TECHNOLOGY']);
 }
 function run() {
   db.initSchema();

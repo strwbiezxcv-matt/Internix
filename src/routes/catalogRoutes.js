@@ -39,7 +39,9 @@ function register(router) {
       program_options: loaders.listProgramOptions(), // full-name selectable programs
       skills,
       fields,
-      locations: loaders.LOCATIONS,
+      // Flat list of selectable regions so the front end can iterate it directly
+      // (and it matches the region definitions used by the Companies section).
+      locations: loaders.LOCATIONS.regions,
       work_arrangements: ['On-site', 'Hybrid', 'Remote']
     });
   });

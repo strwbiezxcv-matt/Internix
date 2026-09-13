@@ -1,0 +1,8 @@
+﻿rejected | 107 | UMS Group Philippines Inc. | https://umsgroup.com.ph/ | ERR:fetch failed
+VERIFIED | 120 | Global Electric Transportation (GET) Philippines | https://www.get.com.ph/ | 200
+rejected | 86 | Toyota Shaw Inc. | https://toyota.com.ph/shaw/ | 403
+VERIFIED | 119 | Global City Auto Sales (Ford Global City) | https://www.ford.com.ph/dealerships/global-city/ | 200
+rejected | 58 | Webmix Philippines Co. | https://webmix.com.ph/ | ERR:fetch failed
+rejected | 59 | MEDIANETH Software Development Services | https://medianeth.com/ | ERR:fetch failed
+rejected | 123 | I Plus One, Inc. | https://iplusone.com.ph/ | ERR:fetch failed
+rejected | 144 | TeleEye Philippines Inc. | https://www.teleeye.ph/ | ERR:fetch failed

@@ -79,8 +79,10 @@ function loadOpportunity(id) {
     `SELECT o.*, c.company_name, c.logo_url AS company_logo,
             c.verification_status AS company_verification,
             c.industry AS company_industry,
+            c.address AS company_address,
             c.website AS company_website,
-            c.official_website AS company_official_website
+            c.official_website AS company_official_website,
+            c.careers_url AS company_careers_url
        FROM internship_opportunities o
        JOIN companies c ON c.id = o.company_id
       WHERE o.id = ?`,
@@ -105,6 +107,10 @@ function loadOpportunity(id) {
     company_name: opp.company_name,
     company_logo: opp.company_logo,
     company_verification: opp.company_verification,
+    company_address: opp.company_address || null,
+    company_website: opp.company_website || null,
+    company_official_website: opp.company_official_website || null,
+    company_careers_url: opp.company_careers_url || null,
     position: opp.position,
     description: opp.description,
     field: field ? field.name : null,
