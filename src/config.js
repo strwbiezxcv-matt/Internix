@@ -53,4 +53,33 @@ const config = {
   publicDir: path.join(ROOT, 'public')
 };
 
+/*
+ * Serverless production support (e.g. Vercel):
+ * The deployment bundle (/var/task) is READ-ONLY, so the SQLite file must live
+ * in the writable /tmp directory. If the configured DB directory is not
+ * writable, fall back to /tmp. Then, if that database does not exist yet, copy
+ * the bundled snapshot (data/internconnect.db) so the full company/program/
+ * opportunity catalogue is available instantly on cold start — no data is
+ * fabricated and nothing is deleted; the fallback is a fresh seed.
+ */
+(function prepareServerlessDb() {
+  try {
+    fs.accessSync(path.dirname(config.dbPath), fs.constants.W_OK);
+  } catch {
+    config.dbPath = path.join('/tmp', 'internconnect.db');
+  }
+
+  const bundled = path.join(ROOT, 'data', 'internconnect.db');
+  if (
+    config.dbPath !== bundled &&
+    !fs.existsSync(config.dbPath) &&
+    fs.existsSync(bundled)
+  ) {
+    try {
+      fs.mkdirSync(path.dirname(config.dbPath), { recursive: true });
+      fs.copyFileSync(bundled, config.dbPath);
+    } catch { /* fall through: db.js/seed will initialise a fresh DB */ }
+  }
+})();
+
 module.exports = config;

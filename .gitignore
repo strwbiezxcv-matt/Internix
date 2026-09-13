@@ -1,9 +1,13 @@
 # Dependencies & runtime
 node_modules/
-data/
+data/*
 *.db
 *.db-journal
 *.db-wal
+# The production DB snapshot is intentionally bundled so serverless
+# deployments (Vercel) cold-start with the full company/program/opportunity
+# catalogue. Do not remove this exception.
+!data/internconnect.db
 
 # Secrets
 .env

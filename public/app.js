@@ -419,7 +419,8 @@ function landingView() {
     const cur = state.profile || {};
     saveProfile({ programs: cur.programs, program: cur.program, specialization: cur.specialization || null, location: e.target.value || null, work_arrangement: cur.work_arrangement || null });
   });
-  $('#progBubbles').querySelectorAll('button[data-prog]').forEach((b) =>
+  const bubbles = $('#browseByProgram');
+  if (bubbles) bubbles.querySelectorAll('button[data-prog]').forEach((b) =>
     b.addEventListener('click', () => { setStoredProgram(b.dataset.prog); go('#/find-matches'); route(); }));
   $('#featuredGrid') && $('#featuredGrid').querySelectorAll('button[data-act]').forEach((b) =>
     b.addEventListener('click', () => openDetail(+b.dataset.id)));
