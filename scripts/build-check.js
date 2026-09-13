@@ -68,8 +68,21 @@ for (const file of fs.readdirSync(srcDir)) {
 
 console.log('--- data layer ---');
 try {
+  const config = require('../src/config');
   const db = require('../src/db');
   db.initSchema();
+
+  // Mirror server.js bootstrap: seed the database when it is empty and seeding
+  // is enabled. seedAll() is fully idempotent (ensure/upsert everywhere), so
+  // running it here never duplicates or destroys existing local data — it only
+  // guarantees that a fresh production environment (e.g. Vercel, where the
+  // SQLite file does not exist yet) gets the full company/program/opportunity
+  // catalogue before validation runs.
+  if (config.seedData && db.get('SELECT COUNT(*) AS c FROM programs').c === 0) {
+    const { seedAll } = require('../src/seed');
+    seedAll();
+  }
+
   const companies = db.get('SELECT COUNT(*) AS c FROM companies').c;
   const programs = db.get('SELECT COUNT(*) AS c FROM programs').c;
   const opps = db.get('SELECT COUNT(*) AS c FROM internship_opportunities').c;
