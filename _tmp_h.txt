@@ -1,0 +1,41 @@
+155:/* ------------------------------ shared cards ------------------------------ */
+156:/* Centralized client-side match helper: ONE implementation used by
+157:   Find My Matches results, Internship Opportunities, Companies, and
+158:   Featured lists so every section ranks identically. */
+159:function clientMatch(o, selectedProgramsArg, selectedLocationArg) {
+160:  const sel = (selectedProgramsArg || []).filter(Boolean);
+161:  const oppCodes = (o.programs || []).map(String);
+162:  const oppNames = (o.program_names || o.relevant_programs || []).map((s) => String(s || '').toLowerCase());
+163:  let programTier = 'mismatch';
+164:  if (!sel.length) programTier = 'none';
+165:  else {
+166:    const opts = (state.catalog && state.catalog.program_options) || [];
+167:    const normSel = sel.map(String);
+168:    const exact = normSel.some((c) => oppCodes.includes(c));
+169:    if (exact) programTier = 'exact';
+170:    else {
+171:      const selNames = opts.filter((x) => normSel.includes(x.value)).map((x) => String(x.label).toLowerCase());
+172:      const relatedHit = selNames.some((n) => oppNames.some((p) => p === n || p.includes(n) || n.includes(p)));
+173:      programTier = relatedHit ? 'related' : (oppCodes.length === 0 ? 'open' : 'mismatch');
+174:    }
+175:  }
+176:  let locationOk = true;
+177:  if (selectedLocationArg) {
+178:    const want = String(selectedLocationArg).toLowerCase();
+179:    const hay = String((o.location || '') + ' ' + (o.province || '') + ' ' + (o.city || '') + ' ' + ((o._loc && o._loc.label) || '')).toLowerCase();
+180:    if (want === 'bulacan') locationOk = hay.includes('bulacan') && !hay.includes('metro manila');
+181:    else if (want === 'metro manila') locationOk = hay.includes('metro manila') || hay.includes(', metro') || hay.includes('manila') || hay.includes('makati') || hay.includes('quezon city') || hay.includes('pasig') || hay.includes('taguig');
+182:    else locationOk = hay.includes(want);
+183:  }
+184:  return { programTier: programTier, locationOk: locationOk };
+185:}
+186:function sameLocationFilter(o, loc) {
+187:  if (!loc) return true;
+188:  return clientMatch(o, [], loc).locationOk;
+189:}
+190:/* Centralized dropdown option builder (single source of truth). */
+191:function programOptionsHtml(selected, placeholder) {
+192:  const opts = (state.catalog && state.catalog.program_options) || [];
+193:  return '<option value="">' + esc(placeholder || 'Select your program...') + '</option>' +
+194:    opts.map((o) => '<option value="' + esc(o.value) + '"' + (o.value === selected ? ' selected' : '') + '>' + esc(o.label) + '</option>').join('');
+195:}

@@ -10,7 +10,7 @@
     "build": "node scripts/build-check.js"
   },
   "engines": {
-    "node": ">=22.5.0"
+    "node": "22.x"
   },
   "keywords": [
     "internship",

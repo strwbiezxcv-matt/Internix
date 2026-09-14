@@ -1,0 +1,60 @@
+371:function landingView() {
+372:  const options = state.catalog ? (state.catalog.program_options || []) : [];
+373:  const sel = selectedProgram();
+374:  const progBubbles = options.slice(0, 10).map((o) =>
+375:    '<button type="button" class="prog-bubble" data-prog="' + esc(o.value) + '">' + esc(o.label) + '</button>').join('');
+376:  const featured = state.opps.slice(0, 3).map((o) => oppCard(o)).join('');
+377:  const popCos = state.companies.slice(0, 6);
+378:  const popCards = popCos.map((c, i) => companyCard(c, i)).join('');
+379:  const locs = (state.catalog && state.catalog.locations) || ['Bulacan', 'Metro Manila'];
+380:  const savedLoc = selectedLocation();
+381:
+382:  app.innerHTML =
+383:    '<section class="hero">' +
+384:      '<h1>Find Internship Opportunities That Match Your Program</h1>' +
+385:      '<p class="hero-sub">Explore internship opportunities and companies across Bulacan and Metro Manila based on your academic program. Browse freely, discover companies, and visit official sources to apply - no account needed.</p>' +
+386:      '<form class="hero-program-form" id="heroProgForm">' +
+387:        '<label for="heroProgram">Which program are you taking?</label>' +
+388:        '<div class="hero-select-row"><select id="heroProgram" class="hero-select">' + programOptionsHtml(sel, 'Select your program...') + '</select>' +
+389:        '<button class="btn btn-primary btn-lg" type="submit">Find My Matches</button></div>' +
+390:        '<div class="hero-select-row" style="margin-top:10px"><select id="heroLocation" class="hero-select" aria-label="Preferred location">' + locationOptionsHtml(savedLoc, 'Anywhere (Bulacan + Metro Manila)') + '</select></div>' +
+391:      '</form>' +
+392:      '<div class="hero-cta">' +
+393:        '<a class="btn btn-outline btn-lg" href="#/opportunities">Browse All Opportunities</a>' +
+394:        '<a class="btn btn-ghost btn-lg" href="#/companies">Explore Companies</a>' +
+395:      '</div>' +
+396:    '</section>' +
+397:    (featured ? '<section class="section"><div class="section-head"><h2>Featured Internship Opportunities</h2><a class="link" href="#/opportunities">View all &rarr;</a></div><div class="grid grid-3" id="featuredGrid">' + featured + '</div></section>' : '') +
+398:    (popCards ? '<section class="section"><div class="section-head"><h2>Popular Companies</h2><a class="link" href="#/companies">Explore all &rarr;</a></div><div class="grid grid-3" id="companyGrid">' + popCards + '</div></section>' : '') +
+399:    '<section class="section" style="margin-top:34px"><div class="section-head"><h2>Browse by Program</h2></div><div class="pills" id="browseByProgram">' + progBubbles + '</div></section>' +
+400:    '<section class="feature-row"><div class="card feature-card"><div class="icon">' + '\u{1F50D}' + '</div><h3>Discover</h3><p>Browse internships and a growing company directory across Bulacan and Metro Manila.</p></div>' +
+401:      '<div class="card feature-card"><div class="icon">' + '\u{1F50C}' + '</div><h3>Match by program</h3><p>Select your academic program and see relevant internships ranked by compatibility.</p></div>' +
+402:      '<div class="card feature-card"><div class="icon">' + '\u{1F4C1}' + '</div><h3>Apply on the source</h3><p>Every listing links to the official company page. Application happens externally.</p></div>' +
+403:    '</section>' +
+404:    '<section class="how-it-works"><h2>How Internix Works</h2><ol><li>Select your academic program (or browse freely).</li><li>Internix ranks internships and companies relevant to your program.</li><li>Review company details and eligibility, then open the official source to apply.</li></ol></section>';
+405:
+406:  const runMatch = () => {
+407:    const code = $('#heroProgram').value;
+408:    if (!code) { toast('Please select your program.', true); return; }
+409:    const loc = $('#heroLocation') ? $('#heroLocation').value : '';
+410:    const profile = { programs: [code], program: code, specialization: null, location: loc || null, work_arrangement: null };
+411:    saveProfile(profile);
+412:    setStoredProgram(code);
+413:    go('#/find-matches');
+414:    route();
+415:  };
+416:  $('#heroProgForm').addEventListener('submit', (e) => { e.preventDefault(); runMatch(); });
+417:  const heroLoc = $('#heroLocation');
+418:  if (heroLoc) heroLoc.addEventListener('change', (e) => {
+419:    const cur = state.profile || {};
+420:    saveProfile({ programs: cur.programs, program: cur.program, specialization: cur.specialization || null, location: e.target.value || null, work_arrangement: cur.work_arrangement || null });
+421:  });
+422:  const bubbles = $('#browseByProgram');
+423:  if (bubbles) bubbles.querySelectorAll('button[data-prog]').forEach((b) =>
+424:    b.addEventListener('click', () => { setStoredProgram(b.dataset.prog); go('#/find-matches'); route(); }));
+425:  $('#featuredGrid') && $('#featuredGrid').querySelectorAll('button[data-act]').forEach((b) =>
+426:    b.addEventListener('click', () => openDetail(+b.dataset.id)));
+427:  $('#companyGrid') && $('#companyGrid').querySelectorAll('[data-cact="view"]').forEach((b) =>
+428:    b.addEventListener('click', () => openCompanyDetail(+b.dataset.cid)));
+429:}
+430:/* ============================== FIND MY MATCHES (program-first) ============================== */

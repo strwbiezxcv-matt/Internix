@@ -1,0 +1,141 @@
+200:    const relevantCodes = [...new Set([...cpCodes, ...oppProgramCodes].filter(Boolean))];
+201:    return {
+202:      ...c,
+203:      open_opportunities: openCount,
+204:      verified_opportunities: verifiedCount,
+205:      has_verified_opening: verifiedCount > 0,
+206:      relevant_programs: [...progNames],
+207:      relevant_specializations: [...specNames],
+208:      internship_availability: hasOpen ? 'available' : 'company_only',
+209:      internship_status: c ? (c.internship_status || 'unknown') : 'unknown',
+210:      relevant_program_codes: relevantCodes,
+211:      municipality: c.municipality || null,
+212:      _loc: locations.parseLocation({
+213:        municipality: c.municipality || null,
+214:        city: c.city || null,
+215:        province: c.province || null,
+216:        raw: c.location
+217:      })
+218:    };
+219:  });
+220:}
+221:
+222:/* ----------------------------- students ----------------------------- */
+223:
+224:function studentProfile(studentId) {
+225:  const s = db.get('SELECT * FROM students WHERE id = ?', studentId);
+226:  if (!s) return null;
+227:  const program = s.program_id ? db.get('SELECT * FROM programs WHERE id = ?', s.program_id) : null;
+228:  const specialization = s.specialization_id
+229:    ? db.get('SELECT * FROM specializations WHERE id = ?', s.specialization_id)
+230:    : null;
+231:  const preferredField = s.preferred_field_id
+232:    ? db.get('SELECT name FROM internship_fields WHERE id = ?', s.preferred_field_id)
+233:    : null;
+234:
+235:  const skills = db.all(
+236:    `SELECT sk.name FROM student_skills ss JOIN skills sk ON sk.id = ss.skill_id
+237:      WHERE ss.student_id = ? ORDER BY sk.name`, studentId).map((r) => r.name);
+238:  const interests = db.all(
+239:    `SELECT f.name FROM student_interests si JOIN internship_fields f ON f.id = si.field_id
+240:      WHERE si.student_id = ? ORDER BY f.name`, studentId).map((r) => r.name);
+241:
+242:  return {
+243:    id: s.id,
+244:    user_id: s.user_id,
+245:    full_name: s.full_name,
+246:    program_id: s.program_id,
+247:    program: program ? program.code : null,
+248:    program_name: program ? program.name : null,
+249:    specialization_id: s.specialization_id,
+250:    specialization: specialization ? specialization.name : null,
+251:    preferred_field_id: s.preferred_field_id,
+252:    preferred_field: preferredField ? preferredField.name : null,
+253:    preferred_location: s.preferred_location,
+254:    work_arrangement: s.work_arrangement,
+255:    internship_duration: s.internship_duration,
+256:    skills,
+257:    interests
+258:  };
+259:}
+260:
+261:function studentIdForUser(userId) {
+262:  const s = db.get('SELECT id FROM students WHERE user_id = ?', userId);
+263:  return s ? s.id : null;
+264:}
+265:
+266:/**
+267: * Resolve a program key (a program code, a full program name, or a
+268: * specialization name) into { program_id, code, name, specialization }.
+269: * The BINDTECH specialization names (e.g. "Computer Technology") resolve to
+270: * their parent program (BINDTECH) with the specialization attached.
+271: */
+272:function resolveProgramKey(key) {
+273:  if (!key) return null;
+274:  const s = String(key).trim();
+275:  const byCode = db.get('SELECT id, code, name FROM programs WHERE code = ?', s);
+276:  if (byCode) return { program_id: byCode.id, code: byCode.code, name: byCode.name, specialization: null };
+277:  const byName = db.get('SELECT id, code, name FROM programs WHERE lower(name) = lower(?)', s);
+278:  if (byName) return { program_id: byName.id, code: byName.code, name: byName.name, specialization: null };
+279:  const spec = db.get(
+280:    `SELECT s.name AS spec, p.id AS program_id, p.code, p.name
+281:       FROM specializations s JOIN programs p ON p.id = s.program_id
+282:      WHERE lower(s.name) = lower(?)`, s
+283:  );
+284:  if (spec) return { program_id: spec.program_id, code: spec.code, name: spec.name, specialization: spec.spec };
+285:
+286:  // Also check specializations by name (for BINDTECH specializations and others)
+287:  const specName = db.get(
+288:    `SELECT s.name AS spec, p.id AS program_id, p.code, p.name
+289:       FROM specializations s JOIN programs p ON p.id = s.program_id
+290:      WHERE lower(s.name) = lower(?)`, s
+291:  );
+292:  if (specName) return { program_id: specName.program_id, code: specName.code, name: specName.name, specialization: specName.spec };
+293:
+294:  return null;
+295:}
+296:
+297:/**
+298: * The user-selectable programs shown with FULL names (never acronyms).
+299: * Driven by the programMap so the 10 supported programs appear as their full,
+300: * human-friendly names while retaining their internal codes for matching.
+301: */
+302:function listProgramOptions() {
+303:  const options = [];
+304:  for (const code of programMap.SELECTABLE) {
+305:    const p = db.get('SELECT id, code, name FROM programs WHERE code = ?', code);
+306:    if (!p) continue;
+307:    options.push({
+308:      value: code,
+309:      label: programMap.displayName(code),
+310:      program_code: code,
+311:      program_id: p.id,
+312:      specialization: null
+313:    });
+314:  }
+315:  return options;
+316:}
+317:
+318:// Grouped location options for the UI (Bulacan + Metro Manila + municipalities).
+319:const LOCATIONS = locations.groupLocations();
+320:
+321:module.exports = {
+322:  loadOpportunity,
+323:  loadAllOpenOpportunities,
+324:  loadAllCompanies,
+325:  studentProfile,
+326:  studentIdForUser,
+327:  resolveProgramKey,
+328:  listProgramOptions,
+329:  LOCATIONS
+330:};
+331:undefined
+332:undefined
+333:undefined
+334:undefined
+335:undefined
+336:undefined
+337:undefined
+338:undefined
+339:undefined
+340:undefined

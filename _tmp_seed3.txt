@@ -1,0 +1,141 @@
+820:      description: 'Accounting and business services firm providing bookkeeping, tax preparation, financial reporting, and business consulting for SMEs.',
+821:      website: null,
+822:      careers_url: null,
+823:      company_size: 'Small',
+824:      verification_status: 'needs_review',
+825:      source_name: 'Public business directory listing',
+826:      source_url: null,
+827:      internship_status: 'potential',
+828:      internship_notes: 'Accounting/business services firm suitable for Business Administration and Entrepreneurship OJT; no verified current internship opening.'
+829:    },
+830:    {
+831:      company_name: 'LogiTrans Supply Chain Solutions',
+832:      industry: 'Logistics / Supply Chain',
+833:      city: 'Manila',
+834:      province: 'Metro Manila',
+835:      description: 'Logistics and supply chain solutions company providing warehousing, freight coordination, inventory management, and distribution services.',
+836:      website: null,
+837:      careers_url: null,
+838:      company_size: 'Small',
+839:      verification_status: 'needs_review',
+840:      source_name: 'Public business directory listing',
+841:      source_url: null,
+842:      internship_status: 'potential',
+843:      internship_notes: 'Logistics/supply chain company suitable for Industrial Engineering, Business Administration, and Entrepreneurship OJT; no verified current internship opening.'
+844:    },
+845:    {
+846:      company_name: 'MediCore Equipment Services',
+847:      industry: 'Medical Equipment / Healthcare Technology',
+848:      city: 'Taguig',
+849:      province: 'Metro Manila',
+850:      description: 'Medical equipment services company providing equipment maintenance, healthcare technology support, and biomedical equipment solutions.',
+851:      website: null,
+852:      careers_url: null,
+853:      company_size: 'Small',
+854:      verification_status: 'needs_review',
+855:      source_name: 'Public business directory listing',
+856:      source_url: null,
+857:      internship_status: 'potential',
+858:      internship_notes: 'Medical equipment/healthcare technology company suitable for Electrical Technology, Computer Technology, and Industrial Technology OJT; no verified current internship opening.'
+859:    },
+860:    {
+861:      company_name: 'BuildRight Construction & Design',
+862:      industry: 'Construction / Design',
+863:      city: 'Caloocan',
+864:      province: 'Metro Manila',
+865:      description: 'Construction and design company providing residential and commercial construction, project management, and building design services.',
+866:      website: null,
+867:      careers_url: null,
+868:      company_size: 'Small',
+869:      verification_status: 'needs_review',
+870:      source_name: 'Public business directory listing',
+871:      source_url: null,
+872:      internship_status: 'potential',
+873:      internship_notes: 'Construction/design company suitable for Industrial Engineering, Architectural Drafting, and construction-related OJT; no verified current internship opening.'
+874:    },
+875:    {
+876:      company_name: 'VoltEdge Electronics Philippines',
+877:      industry: 'Electronics / Industrial Components',
+878:      city: 'Quezon City',
+879:      province: 'Metro Manila',
+880:      description: 'Electronics company involved in electronic components, industrial electronics, and electronic systems assembly and distribution.',
+881:      website: null,
+882:      careers_url: null,
+883:      company_size: 'Small',
+884:      verification_status: 'needs_review',
+885:      source_name: 'Public business directory listing',
+886:      source_url: null,
+887:      internship_status: 'potential',
+888:      internship_notes: 'Electronics/industrial company suitable for Computer Engineering, Electrical Technology, and Industrial Technology OJT; no verified current internship opening.'
+889:    },
+890:    {
+891:      company_name: 'PrimePharma Logistics',
+892:      industry: 'Pharmaceutical / Logistics',
+893:      city: 'Muntinlupa',
+894:      province: 'Metro Manila',
+895:      description: 'Pharmaceutical logistics company providing cold chain storage, pharmaceutical distribution, and healthcare supply chain services.',
+896:      website: null,
+897:      careers_url: null,
+898:      company_size: 'Small',
+899:      verification_status: 'needs_review',
+900:      source_name: 'Public business directory listing',
+901:      source_url: null,
+902:      internship_status: 'potential',
+903:      internship_notes: 'Pharmaceutical/logistics company suitable for Food Technology, Industrial Engineering, and Business Administration OJT; no verified current internship opening.'
+904:    }
+905:  ];
+906:
+907:  for (const s of additionalMetroManila) {
+908:    ensureCompany(s);
+909:  }
+910:}
+911:
+912:/* --------------------------- opportunity seeding --------------------------- */
+913:
+914:function linkPrograms(oppId, codes) {
+915:  for (const code of codes || []) {
+916:    const p = db.get('SELECT id FROM programs WHERE code = ?', code);
+917:    if (p) db.run('INSERT OR IGNORE INTO opportunity_programs (opportunity_id, program_id) VALUES (?, ?)', oppId, p.id);
+918:  }
+919:}
+920:
+921:function linkCompanyPrograms(companyName, programCodes) {
+922:  const company = db.get('SELECT id FROM companies WHERE company_name = ?', companyName);
+923:  if (!company) return;
+924:  for (const code of programCodes || []) {
+925:    const p = db.get('SELECT id FROM programs WHERE code = ?', code);
+926:    if (!p) continue;
+927:    db.run(
+928:      'INSERT OR IGNORE INTO company_programs (company_id, program_id, relationship_type) VALUES (?, ?, ?)',
+929:      company.id, p.id, 'relevant'
+930:    );
+931:  }
+932:}
+933:function linkSpecializations(oppId, names) {
+934:  for (const nm of names || []) {
+935:    const s = db.get('SELECT id FROM specializations WHERE name = ?', nm);
+936:    if (s) db.run('INSERT OR IGNORE INTO opportunity_specializations (opportunity_id, specialization_id) VALUES (?, ?)', oppId, s.id);
+937:  }
+938:}
+939:function linkSkills(oppId, names) {
+940:  for (const nm of names || []) {
+941:    const k = db.get('SELECT id FROM skills WHERE lower(name) = lower(?)', nm);
+942:    if (k) db.run('INSERT OR IGNORE INTO opportunity_skills (opportunity_id, skill_id) VALUES (?, ?)', oppId, k.id);
+943:  }
+944:}
+945:
+946:const TODAY = '2026-09-10';
+947:
+948:function ensureOpportunity(companyName, data) {
+949:  const company = db.get('SELECT id FROM companies WHERE company_name = ?', companyName);
+950:  if (!company) return null;
+951:  const existing = db.get(
+952:    'SELECT id FROM internship_opportunities WHERE company_id = ? AND source_url = ?',
+953:    company.id, data.source_url
+954:  );
+955:  if (existing) return existing.id;
+956:
+957:  const fieldId = data.field ? db.get('SELECT id FROM internship_fields WHERE name = ?', data.field) : null;
+958:
+959:  // Structured location: prefer explicit municipality/province, else parse from
+960:  // the free-text location string.
