@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 /* ============================================================
    Internix - Student Internship Discovery + Company Directory
    Program-first matching platform. No accounts, no application
@@ -277,7 +277,7 @@ function oppCard(o, showScore) {
         (o.work_arrangement ? ' &bull; ' + esc(o.work_arrangement) : '') + '</div></div>' + score +
     '</div>' +
     '<div class="tag-row">' + progLabels +
-      (o.programs.length > 3 ? '<span class="tag neutral">+' + (o.programs.length - 3) + ' more</span>' : '') +
+      (progs.length > 3 ? '<span class="tag neutral">+' + (progs.length - 3) + ' more</span>' : '') +
     '</div>' +
     '<p class="opp-meta">' + esc((o.description || '').slice(0, 140)) + (o.description && o.description.length > 140 ? '&hellip;' : '') + '</p>' +
     '<div class="opp-actions"><button class="btn btn-primary btn-sm" data-act="view" data-id="' + o.id + '">View Details</button>' +

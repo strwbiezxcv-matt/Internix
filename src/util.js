@@ -40,8 +40,12 @@ function parseQuery(raw) {
   for (const part of raw.split('&')) {
     if (!part) continue;
     const eq = part.indexOf('=');
-    const key = decodeURIComponent(eq > -1 ? part.slice(0, eq) : part);
-    const value = eq > -1 ? decodeURIComponent(part.slice(eq + 1)) : '';
+    // URLSearchParams / application/x-www-form-urlencoded encodes spaces as '+'.
+    // decodeURIComponent alone does NOT turn '+' into a space, so we must replace
+    // it first. Without this, 'Metro+Manila' never matches 'Metro Manila' and
+    // location/province filters silently return 0 results.
+    const key = decodeURIComponent((eq > -1 ? part.slice(0, eq) : part).replace(/\+/g, ' '));
+    const value = eq > -1 ? decodeURIComponent(part.slice(eq + 1).replace(/\+/g, ' ')) : '';
     if (!key) continue;
     if (Object.prototype.hasOwnProperty.call(out, key)) {
       out[key] = Array.isArray(out[key]) ? out[key] : [out[key]];
