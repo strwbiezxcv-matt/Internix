@@ -24,11 +24,11 @@
   --amber-bg:  #fdf5e4;
   --font-display: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
   --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --radius:    16px;
-  --radius-sm: 11px;
-  --shadow-sm: 0 1px 2px rgba(18, 38, 27, 0.05), 0 2px 8px rgba(18, 38, 27, 0.04);
-  --shadow:    0 1px 2px rgba(18, 38, 27, 0.06), 0 6px 20px rgba(18, 38, 27, 0.07);
-  --shadow-lg: 0 12px 40px rgba(18, 38, 27, 0.16);
+  --radius:    20px;
+  --radius-sm: 13px;
+  --shadow-sm: 0 0 0 1px rgba(18, 48, 34, 0.03), 0 4px 14px rgba(18, 48, 34, 0.05);
+  --shadow:    0 1px 2px rgba(18, 48, 34, 0.05), 0 10px 26px rgba(18, 48, 34, 0.06);
+  --shadow-lg:  0 20px 50px rgba(18, 48, 34, 0.14);
   font-size: 16px;
 }
 
@@ -408,6 +408,10 @@ select.select-lg,
 .stat-card .lbl { color: var(--ink-soft); font-size: 0.9rem; margin-top: 2px; }
 
 .feature-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+/* Comfortable, intentional gap between "Browse by Program" and the
+   Discover / Match by program / Apply on the Source cards on the landing page. */
+.landing-features { margin-top: 46px; }
+.browse-section { margin-top: 46px; }
 .feature-card {
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 24px; box-shadow: var(--shadow-sm);
@@ -644,11 +648,18 @@ select.select-lg,
 }
 
 .filter-bar {
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 18px; box-shadow: var(--shadow); margin-bottom: 26px;
-  display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr auto; gap: 14px; align-items: end;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow); margin-bottom: 28px;
+  display: grid;
+  /* Wider, responsive filter controls: each control gets comfortable room so
+     full program names, locations and work-arrangement text stay readable. */
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px; align-items: end;
 }
-.filter-bar .q-field { grid-column: span 1; }
+.filter-bar .q-field { min-width: 250px; }
 .field-actions { display: flex; gap: 8px; align-items: center; padding-bottom: 1px; }
 .location-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
@@ -821,8 +832,17 @@ select:focus, input:focus { border-color: var(--green-500); outline: none; box-s
 .opp-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 
 /* --- landing hero CTA row (template uses the singular .hero-cta) --- */
-.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 34px; }
 .hero-cta .btn { min-width: 210px; padding: 14px 26px; font-size: 1rem; }
+
+/* Landing location (optional) block — kept apart from the CTA row below. */
+.hero-loc-block { width: 100%; max-width: 720px; margin: 0 auto; }
+.hero-loc-block > label {
+  display: block; text-align: center;
+  font-weight: 600; font-size: 0.95rem; color: var(--ink);
+  margin-bottom: 12px;
+}
+.hero-loc-block .hint { color: var(--ink-faint); font-weight: 500; }
 
 /* --- two-up form row (Find My Matches) --- */
 .form-row {
@@ -872,4 +892,35 @@ select:focus, input:focus { border-color: var(--green-500); outline: none; box-s
   .match-card-top { flex-wrap: wrap; }
   .match-badge { min-width: 68px; }
 }
+/* ============================================================
+   Cozy + modern polish — soft glass surfaces, refined borders,
+   gentle hover feedback. Tasteful green accents, no gimmicks.
+   ============================================================ */
+.opp-card, .company-card, .match-card, .feature-card,
+.how-it-works, .stat-card, .detail-card, .match-summary .filter-bar {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  border-color: #eaf1ec;
+}
+.opp-card:hover, .company-card:hover, .match-card:hover, .feature-card:hover {
+  border-color: #cfe2d6;
+  box-shadow: var(--shadow);
+}
+.topbar { background: rgba(255, 255, 255, 0.72); }
+.modal { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px) saturate(140%); -webkit-backdrop-filter: blur(20px) saturate(140%); }
+
+/* optgroup headers inside grouped location dropdowns — clear Bulacan vs Metro */
+select optgroup {
+  font-style: normal; font-weight: 700; color: var(--green-800);
+  background: var(--green-50);
+}
+select optgroup option {
+  font-weight: 500; color: var(--ink);
+  padding: 10px 12px; background: #fff; white-space: normal;
+}
+select option { padding: 10px 12px; white-space: normal; }
+
+/* Slightly roomier, friendlier inputs */
+input, select { border-radius: 12px; }
 :focus-visible { outline: 2px solid var(--green-500); outline-offset: 2px; }

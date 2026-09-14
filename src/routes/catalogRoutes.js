@@ -42,6 +42,10 @@ function register(router) {
       // Flat list of selectable regions so the front end can iterate it directly
       // (and it matches the region definitions used by the Companies section).
       locations: loaders.LOCATIONS.regions,
+      // Grouped municipalities for optgroup dropdowns — single source of truth
+      // used by every section (Home, Opportunities, Companies, Find My Matches).
+      bulacan: loaders.LOCATIONS.bulacan,
+      metro: loaders.LOCATIONS.metro,
       work_arrangements: ['On-site', 'Hybrid', 'Remote']
     });
   });

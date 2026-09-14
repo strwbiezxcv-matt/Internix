@@ -11,8 +11,11 @@
  */
 
 // Canonical Bulacan municipalities (region label in the UI is "Bulacan").
+// "Baliuag" is the canonical/controlled spelling shown to users; the seed data
+// historically stored "Baliwag" (an equivalent alternate spelling), which is
+// normalised via ALIASES so existing records keep matching this municipality.
 const BULACAN = [
-  'Angat', 'Balagtas', 'Baliwag', 'Bocaue', 'Bulakan', 'Bustos', 'Calumpit',
+  'Angat', 'Balagtas', 'Baliuag', 'Bocaue', 'Bulakan', 'Bustos', 'Calumpit',
   'Doña Remedios Trinidad', 'Guiguinto', 'Hagonoy', 'Malolos', 'Marilao',
   'Meycauayan', 'Norzagaray', 'Obando', 'Pandi', 'Paombong', 'Plaridel',
   'Pulilan', 'San Ildefonso', 'San Jose del Monte', 'San Miguel', 'San Rafael',
@@ -58,7 +61,8 @@ const ALIASES = {
   'meycauayan': 'Meycauayan',
   'malolos': 'Malolos',
   'balagtas': 'Balagtas',
-  'baliwag': 'Baliwag',
+  'baliwag': 'Baliuag',
+  'baliuag': 'Baliuag',
   'bocaue': 'Bocaue',
   'bulakan': 'Bulakan',
   'bustos': 'Bustos',
@@ -130,7 +134,9 @@ function parseLocation(value) {
   let raw = '';
 
   if (typeof value === 'object') {
-    municipality = value.municipality || value.city || null;
+    // Normalise municipality through the alias map so historically-stored
+    // spellings (e.g. "Baliwag") resolve to the canonical municipality name.
+    municipality = findMunicipality(value.municipality || value.city) || value.municipality || null;
     city = value.city || value.municipality || null;
     province = value.province || value.region || null;
     raw = value.raw || [municipality, province].filter(Boolean).join(', ');

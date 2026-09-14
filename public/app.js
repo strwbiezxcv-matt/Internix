@@ -193,10 +193,25 @@ function programOptionsHtml(selected, placeholder) {
   return '<option value="">' + esc(placeholder || 'Select your program...') + '</option>' +
     opts.map((o) => '<option value="' + esc(o.value) + '"' + (o.value === selected ? ' selected' : '') + '>' + esc(o.label) + '</option>').join('');
 }
-function locationOptionsHtml(selected, placeholder) {
-  const locs = (state.catalog && state.catalog.locations) || ['Bulacan', 'Metro Manila'];
-  return '<option value="">' + esc(placeholder || 'Select location...') + '</option>' +
-    locs.map((l) => '<option value="' + esc(l) + '"' + (l === selected ? ' selected' : '') + '>' + esc(l) + '</option>').join('');
+/* Fallback canonical lists (mirror src/locations.js) used before the catalog loads. */
+const DEFAULT_BULACAN = ['Angat','Balagtas','Baliuag','Bocaue','Bulakan','Bustos','Calumpit','Doña Remedios Trinidad','Guiguinto','Hagonoy','Malolos','Marilao','Meycauayan','Norzagaray','Obando','Pandi','Paombong','Plaridel','Pulilan','San Ildefonso','San Jose del Monte','San Miguel','San Rafael','Santa Maria'];
+const DEFAULT_METRO = ['Caloocan','Las Piñas','Makati','Malabon','Mandaluyong','Manila','Marikina','Muntinlupa','Navotas','Parañaque','Pasay','Pasig','Pateros','Quezon City','San Juan','Taguig','Valenzuela'];
+/* Grouped location options (Bulacan ⏵ municipalities, Metro Manila ⏵ cities).
+   Regions and every municipality/city come from the single catalog source. */
+function locationOptionsHtml(selected, placeholder, empty) {
+  const bul = (state.catalog && state.catalog.bulacan) || DEFAULT_BULACAN;
+  const metro = (state.catalog && state.catalog.metro) || DEFAULT_METRO;
+  const opt = (v, label) => '<option value="' + esc(v) + '"' + (v === selected ? ' selected' : '') + '>' + esc(label) + '</option>';
+  const group = (label, province, list) =>
+    '<optgroup label="' + esc(label) + '">' +
+      opt(province, 'All of ' + label) +
+      list.map((m) => opt(m, m)).join('') +
+    '</optgroup>';
+  let html = (empty !== false)
+    ? '<option value="">' + esc(placeholder || 'All locations') + '</option>'
+    : '';
+  html += group('Bulacan', 'Bulacan', bul) + group('Metro Manila', 'Metro Manila', metro);
+  return html;
 }
 function arrangementOptionsHtml(selected) {
   return '<option value="">Any arrangement</option>' +
@@ -370,7 +385,10 @@ async function openCompanyDetail(id) {
 /* ============================== LANDING PAGE ============================== */
 function landingView() {
   const options = state.catalog ? (state.catalog.program_options || []) : [];
-  const sel = selectedProgram();
+  // No preselection: the Program dropdown always starts empty ("Select your program...").
+  // Previously selected programs still drive other sections via state.profile, but the
+  // Home dropdown itself is never auto-filled (user must choose manually).
+  const sel = null;
   const progBubbles = options.slice(0, 10).map((o) =>
     '<button type="button" class="prog-bubble" data-prog="' + esc(o.value) + '">' + esc(o.label) + '</button>').join('');
   const featured = state.opps.slice(0, 3).map((o) => oppCard(o)).join('');
@@ -387,7 +405,8 @@ function landingView() {
         '<label for="heroProgram">Which program are you taking?</label>' +
         '<div class="hero-select-row"><select id="heroProgram" class="hero-select">' + programOptionsHtml(sel, 'Select your program...') + '</select>' +
         '<button class="btn btn-primary btn-lg" type="submit">Find My Matches</button></div>' +
-        '<div class="hero-select-row" style="margin-top:10px"><select id="heroLocation" class="hero-select" aria-label="Preferred location">' + locationOptionsHtml(savedLoc, 'Anywhere (Bulacan + Metro Manila)') + '</select></div>' +
+        '<div class="hero-loc-block"><label for="heroLocation">Preferred location <span class="hint">(optional)</span></label>' +
+        '<div class="hero-select-row"><select id="heroLocation" class="hero-select" aria-label="Preferred location">' + locationOptionsHtml(savedLoc, 'All locations') + '</select></div></div>' +
       '</form>' +
       '<div class="hero-cta">' +
         '<a class="btn btn-outline btn-lg" href="#/opportunities">Browse All Opportunities</a>' +
@@ -396,8 +415,8 @@ function landingView() {
     '</section>' +
     (featured ? '<section class="section"><div class="section-head"><h2>Featured Internship Opportunities</h2><a class="link" href="#/opportunities">View all &rarr;</a></div><div class="grid grid-3" id="featuredGrid">' + featured + '</div></section>' : '') +
     (popCards ? '<section class="section"><div class="section-head"><h2>Popular Companies</h2><a class="link" href="#/companies">Explore all &rarr;</a></div><div class="grid grid-3" id="companyGrid">' + popCards + '</div></section>' : '') +
-    '<section class="section" style="margin-top:34px"><div class="section-head"><h2>Browse by Program</h2></div><div class="pills" id="browseByProgram">' + progBubbles + '</div></section>' +
-    '<section class="feature-row"><div class="card feature-card"><div class="icon">' + '\u{1F50D}' + '</div><h3>Discover</h3><p>Browse internships and a growing company directory across Bulacan and Metro Manila.</p></div>' +
+    '<section class="section browse-section"><div class="section-head"><h2>Browse by Program</h2></div><div class="pills" id="browseByProgram">' + progBubbles + '</div></section>' +
+    '<section class="feature-row landing-features"><div class="card feature-card"><div class="icon">' + '\u{1F50D}' + '</div><h3>Discover</h3><p>Browse internships and a growing company directory across Bulacan and Metro Manila.</p></div>' +
       '<div class="card feature-card"><div class="icon">' + '\u{1F50C}' + '</div><h3>Match by program</h3><p>Select your academic program and see relevant internships ranked by compatibility.</p></div>' +
       '<div class="card feature-card"><div class="icon">' + '\u{1F4C1}' + '</div><h3>Apply on the source</h3><p>Every listing links to the official company page. Application happens externally.</p></div>' +
     '</section>' +
@@ -405,7 +424,7 @@ function landingView() {
 
   const runMatch = () => {
     const code = $('#heroProgram').value;
-    if (!code) { toast('Please select your program.', true); return; }
+    if (!code) { toast('Please select a program first.', true); return; }
     const loc = $('#heroLocation') ? $('#heroLocation').value : '';
     const profile = { programs: [code], program: code, specialization: null, location: loc || null, work_arrangement: null };
     saveProfile(profile);
@@ -433,10 +452,10 @@ function matchView() {
   if (!cat) { app.innerHTML = '<div class="empty skeleton">Loading...</div>'; return; }
   const p = state.profile || {};
   const options = cat.program_options || [];
-  const stored = p.programs || (p.program ? [p.program] : null) || (getStoredProgram() ? [getStoredProgram()] : []);
+  // No preselection: program checkboxes always start unchecked. The user must
+  // manually pick at least one program before matching (validated on submit).
+  const stored = [];
   const locSel = p.location || '';
-  const locOpts = (cat.locations || []).map((l) =>
-    '<option value="' + esc(l) + '" ' + (l === locSel ? 'selected' : '') + '>' + esc(l) + '</option>').join('');
   const arrOpts = ARRANGEMENTS.map((a) =>
     '<option value="' + esc(a) + '" ' + (a === p.work_arrangement ? 'selected' : '') + '>' + esc(a) + '</option>').join('');
   const checks = options.map((o) =>
@@ -450,7 +469,7 @@ function matchView() {
         '<div class="prog-check-grid" role="group" aria-labelledby="progLabel">' + checks + '</div></div>' +
       '<div class="form-row" style="margin-top:14px">' +
         '<div class="field"><label for="locSelect">Location</label>' +
-          '<select id="locSelect"><option value="">Anywhere (Bulacan + Metro Manila)</option>' + locOpts + '</select></div>' +
+          '<select id="locSelect">' + locationOptionsHtml(locSel, 'All locations') + '</select></div>' +
         '<div class="field"><label for="arrSelect">Work arrangement <span class="hint">(optional)</span></label>' +
           '<select id="arrSelect"><option value="">Any</option>' + arrOpts + '</select></div>' +
       '</div>' +
@@ -549,9 +568,9 @@ function matchesView() {
     holder.querySelectorAll('[data-act="view"]').forEach((b) => b.addEventListener('click', () => openDetail(+b.dataset.id)));
   };
   const render = () => {
-    $('#matchSummary').innerHTML = '<form class="filter-bar" id="matchFilter" style="grid-template-columns:2fr 1fr 1fr auto">' +
+    $('#matchSummary').innerHTML = '<form class="filter-bar" id="matchFilter">' +
       '<div class="field q-field"><label>Search</label><input type="text" id="matchQ" placeholder="Position, company, keyword..." value="' + esc(filters.q) + '"></div>' +
-      '<div class="field"><label>Location</label><select id="matchLoc"><option value="">Any</option>' + (state.catalog.locations || []).map((l) => '<option' + (filters.loc === l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select></div>' +
+      '<div class="field"><label>Location</label><select id="matchLoc">' + locationOptionsHtml(filters.loc, 'Any') + '</select></div>' +
       '<div class="field"><label>Arrangement</label><select id="matchArr"><option value="">Any</option>' + ARRANGEMENTS.map((a) => '<option' + (filters.arr === a ? ' selected' : '') + '>' + esc(a) + '</option>').join('') + '</select></div>' +
       '<div class="field field-actions"><button class="btn btn-ghost btn-sm" type="button" id="matchClearBtn">Clear</button></div>' +
       '</form>';
@@ -576,7 +595,7 @@ async function browseView() {
     '<form class="filter-bar" id="filterForm">' +
       '<div class="field q-field"><label>Search</label><input type="text" id="fQ" placeholder="Position, company, keyword, skill, location..."></div>' +
       '<div class="field"><label>Program</label><select id="fProgram"><option value="">All programs</option>' + (cat.program_options || []).map(opt).join('') + '</select></div>' +
-      '<div class="field"><label>Location</label><select id="fLocation"><option value="">All locations</option>' + (cat.locations || []).map((l) => '<option>' + esc(l) + '</option>').join('') + '</select></div>' +
+      '<div class="field"><label>Location</label><select id="fLocation">' + locationOptionsHtml('', 'All locations') + '</select></div>' +
       '<div class="field"><label>Work arrangement</label><select id="fArrangement"><option value="">Any</option>' + ARRANGEMENTS.map((a) => '<option>' + esc(a) + '</option>').join('') + '</select></div>' +
       '<div class="field"><label>Company</label><select id="fCompany"><option value="">All companies</option>' + companyOpts + '</select></div>' +
       '<div class="field field-actions"><button class="btn btn-primary btn-sm" type="submit">Search</button><button class="btn btn-ghost btn-sm" type="button" id="fClear">Clear</button></div>' +
@@ -623,7 +642,17 @@ async function companiesView() {
       const progLabel = progObj ? String(progObj.label).toLowerCase() : '';
       const list = state.companies.filter((c) => {
         if (q && !(c.company_name + ' ' + (c.industry || '') + ' ' + (c.description || '') + ' ' + (c.city || '') + ' ' + (c.relevant_programs || []).join(' ')).toLowerCase().includes(q)) return false;
-        if (filter.province && ((c.province || '') || (c.region || '')) !== filter.province) return false;
+        if (filter.province) {
+          const wan = filter.province;
+          const cprov = (c.province || '') || (c.region || '');
+          if (wan === 'Bulacan' || wan === 'Metro Manila') {
+            if (cprov !== wan) return false;
+          } else {
+            // Specific municipality/city: a company must physically be in it.
+            const cmun = (c._loc && c._loc.municipality) || c.municipality || c.city || '';
+            if (String(cmun).toLowerCase() !== wan.toLowerCase()) return false;
+          }
+        }
         if (filter.program) {
           const names = (c.relevant_programs || []).map((s) => String(s).toLowerCase());
           const codes = (c.relevant_program_codes || []).map(String);
@@ -651,7 +680,7 @@ async function companiesView() {
       '<div class="page-head"><h1>Companies</h1><p>Explore real organizations across Bulacan and Metro Manila. A company here may or may not have a current internship opening - availability is shown per company.</p></div>' +
       '<form class="filter-bar" id="companyFilter">' +
         '<div class="field q-field"><label>Search</label><input type="text" id="cQ" placeholder="Company name, industry, keyword..."></div>' +
-        '<div class="field"><label>Location</label><select id="cProvince"><option value="">All locations</option><option>Bulacan</option><option>Metro Manila</option></select></div>' +
+        '<div class="field"><label>Location</label><select id="cProvince">' + locationOptionsHtml(filter.province, 'All locations') + '</select></div>' +
         '<div class="field"><label>Program</label><select id="cProgram"><option value="">All programs</option>' + progOpts + '</select></div>' +
         '<div class="field field-actions"><button class="btn btn-primary btn-sm" type="submit">Search</button><button class="btn btn-ghost btn-sm" type="button" id="cClear">Clear</button></div>' +
       '</form>' +

@@ -46,7 +46,14 @@ function parsePrograms(body) {
 }
 
 function locationInRegion(opp, selection) {
-  if (!selection || !selection.province) return true;
+  if (!selection) return true;
+  // When a specific municipality/city is chosen, only THAT municipality may
+  // pass — never every city in the same broad region (§ location matching).
+  if (selection.municipality) {
+    const om = opp && opp._loc ? opp._loc.municipality : (opp.municipality || null);
+    return !!om && norm(om) === norm(selection.municipality);
+  }
+  if (!selection.province) return true;
   const op = opp && opp._loc ? opp._loc.province : (opp.province || null);
   return op && norm(op) === norm(selection.province);
 }
