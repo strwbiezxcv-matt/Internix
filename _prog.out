@@ -1,0 +1,96 @@
+14: profile: null,      // { program, program_name, specialization, location, work_arrangement }
+61: function programNames(list) {
+62: return (state.catalog ? state.catalog.programs : []).filter((p) => list.includes(p.code)).map((p) => p.name);
+128: /* ---------------------- selected program (localStorage) ---------------------- */
+134: const PROG_KEY = 'internix.selectedProgram';
+137: function selectedProgram() { return state.profile && state.profile.program ? state.profile.program : (getStoredProgram() || null); }
+138: function selectedPrograms() {
+139: if (state.profile && Array.isArray(state.profile.programs) && state.profile.programs.length) return state.profile.programs.slice();
+140: const single = selectedProgram();
+143: function programLabel(code) {
+144: const o = (state.catalog && state.catalog.program_options || []).find((x) => x.value === code);
+148: function programLabels(codes) { return (codes || []).map(programLabel); }
+160: function clientMatch(o, selectedProgramsArg, selectedLocationArg) {
+161: const sel = (selectedProgramsArg || []).filter(Boolean);
+162: const oppCodes = (o.programs || []).map(String);
+163: const oppNames = (o.program_names || o.relevant_programs || []).map((s) => String(s || '').toLowerCase());
+164: let programTier = 'mismatch';
+165: if (!sel.length) programTier = 'none';
+167: const opts = (state.catalog && state.catalog.program_options) || [];
+170: if (exact) programTier = 'exact';
+174: programTier = relatedHit ? 'related' : (oppCodes.length === 0 ? 'open' : 'mismatch');
+185: return { programTier: programTier, locationOk: locationOk };
+192: function programOptionsHtml(selected, placeholder) {
+193: const opts = (state.catalog && state.catalog.program_options) || [];
+194: return '<option value="">' + esc(placeholder || 'Select your program...') + '</option>' +
+261: const progs = (o.programs || []);
+280: const progs = (o.programs || []);
+282: const label = programNames([p])[0] || p;
+312: const progs = (o.program_names && o.program_names.length)
+313: ? o.program_names
+314: : (o.programs || []).map((p) => programNames([p])[0] || p);
+324: programs: progs,
+335: const progs = (c.relevant_programs || []);
+356: const progs = (d.relevant_program_names && d.relevant_program_names.length)
+357: ? d.relevant_program_names
+358: : (c.relevant_programs || []);
+378: programs: progs,
+388: const options = state.catalog ? (state.catalog.program_options || []) : [];
+389: // No preselection: the Program dropdown always starts empty ("Select your program...").
+390: // Previously selected programs still drive other sections via state.profile, but the
+404: '<p class="hero-sub">Explore internship opportunities and companies across Bulacan and Metro Manila based on your academic program. Browse freely, dis
+405: '<form class="hero-program-form" id="heroProgForm">' +
+406: '<label for="heroProgram">Which program are you taking?</label>' +
+407: '<div class="hero-select-row"><select id="heroProgram" class="hero-select">' + programOptionsHtml(sel, 'Select your program...') + '</select>' +
+421: '<div class="card feature-card"><div class="icon">' + '\u{1F50C}' + '</div><h3>Match by program</h3><p>Select your academic program and see relevant i
+424: '<section class="how-it-works"><h2>How Internix Works</h2><ol><li>Select your academic program (or browse freely).</li><li>Internix ranks internships 
+428: if (!code) { toast('Please select a program first.', true); return; }
+430: const profile = { programs: [code], program: code, specialization: null, location: loc || null, work_arrangement: null };
+440: saveProfile({ programs: cur.programs, program: cur.program, specialization: cur.specialization || null, location: e.target.value || null, work_arrange
+450: /* ============================== FIND MY MATCHES (program-first) ============================== */
+455: const options = cat.program_options || [];
+456: // No preselection: program checkboxes always start unchecked. The user must
+457: // manually pick at least one program before matching (validated on submit).
+466: '<div class="page-head"><h1>Find My Matches</h1><p class="page-sub">Select your program(s) and location. Internix ranks opportunities by program compa
+491: if (!codes.length) { toast('Please select at least one program.', true); return; }
+493: programs: codes,
+494: program: codes[0],
+501: try { localStorage.setItem('internix.selectedPrograms', JSON.stringify(codes)); } catch {}
+516: const progNames = profile.program_names || (profile.program_name ? [profile.program_name] : (profile.program ? [profile.program] : []));
+524: const progs = (o.program_names || []).slice(0, 2).map((p) => '<span class="tag">' + esc(p) + '</span>').join('');
+538: '<p>Based on your selected program' + (progNames.length > 1 ? 's' : '') + ': <strong>' + esc(progNames.join(' + ')) + '</strong>' +
+540: ' Scores are program-to-opportunity compatibility for ranking - they do not predict acceptance or hiring.</p></div>' +
+566: if (count) count.innerHTML = 'Showing <strong>' + unique.length + '</strong> of <strong>' + results.length + '</strong> matched opportunit' + (results
+567: if (!unique.length) { holder.innerHTML = '<div class="empty">No matches found. Adjust your program or <a href="#/find-matches">update your details</a>
+592: // Don't auto-select stored program - user must explicitly choose from dropdown
+598: '<div class="field"><label>Program</label><select id="fProgram"><option value="">All programs</option>' + (cat.program_options || []).map(opt).join(''
+608: const p = $('#fProgram').value; if (p) params.set('program', p);
+618: // Only filter by program if user explicitly selected one in the dropdown
+619: const programFilter = $('#fProgram').value;
+620: const list = programFilter ? rows.filter((o) => (o.programs || []).includes(programFilter)) : rows;
+623: // Show appropriate message based on whether program was selected
+626: if (programFilter) {
+627: const progObj = (cat.program_options || []).find((o) => o.value === programFilter);
+628: const progName = progObj ? progObj.label : programFilter;
+629: note.innerHTML = '<span>Showing <strong>' + list.length + '</strong> opportunities relevant to <strong>' + esc(progName) + '</strong>.</span>';
+631: note.innerHTML = '<span>Showing <strong>' + list.length + '</strong> internship opportunities.</span>';
+643: const filter = { q: '', province: '', program: '' };
+652: const progObj = filter.program ? (cat ? (cat.program_options || []).find((o) => o.value === filter.program) : null) : null;
+655: if (q && !(c.company_name + ' ' + (c.industry || '') + ' ' + (c.description || '') + ' ' + (c.city || '') + ' ' + (c.relevant_programs || []).join(' '
+667: if (filter.program) {
+668: const names = (c.relevant_programs || []).map((s) => String(s).toLowerCase());
+669: const codes = (c.relevant_program_codes || []).map(String);
+671: const byCode = codes.includes(filter.program);
+689: const progOpts = (cat ? cat.program_options : []).map((o) => '<option value="' + esc(o.value) + '">' + esc(o.label) + '</option>').join('');
+695: '<div class="field"><label>Program</label><select id="cProgram"><option value="">All programs</option>' + progOpts + '</select></div>' +
+699: $('#companyFilter').addEventListener('submit', (e) => { e.preventDefault(); filter.q = $('#cQ').value; filter.province = $('#cProvince').value; filter
+700: $('#cClear').addEventListener('click', () => { $('#companyFilter').reset(); filter.q = ''; filter.province = ''; filter.program = ''; render(); });
+746: const optCount = state.catalog ? (state.catalog.program_options || []).length : 0;
+750: '<div class="card feature-card"><div class="icon">' + '\u{1F3E0}' + '</div><h3>What is Internix?</h3><p>Internix is an internship discovery and matchi
+751: '<div class="card feature-card"><div class="icon">' + '\u{1F4CA}' + '</div><h3>How matching works</h3><p>Select your program and Internix ranks opport
+758: '<section class="how-it-works"><h2>Programs supported</h2><p>Internix supports the following programs (full names):</p><div class="pills">' +
+759: (state.catalog ? state.catalog.program_options.map((o) => '<span class="tag">' + esc(o.label) + '</span>').join('') : '') + '</div></section>' +
+785: try { state.catalog = await api('GET', '/api/catalog'); } catch { state.catalog = { programs: [], program_options: [], skills: [], fields: [], locatio
+789: if (sp && sp.program) state.profile = sp;
+
+TOTAL LINES 831

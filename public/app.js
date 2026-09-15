@@ -589,7 +589,7 @@ async function browseView() {
   const cat = state.catalog;
   if (!cat) { app.innerHTML = '<div class="empty skeleton">Loading...</div>'; return; }
   const opt = (o) => '<option value="' + esc(o.value) + '">' + esc(o.label) + '</option>';
-  const sel = selectedProgram();
+  // Don't auto-select stored program - user must explicitly choose from dropdown
   const companyOpts = state.companies.map((c) => '<option value="' + esc(c.company_name) + '">' + esc(c.company_name) + '</option>').join('');
   app.innerHTML =
     '<div class="page-head"><h1>Internship Opportunities</h1></div>' +
@@ -602,7 +602,7 @@ async function browseView() {
       '<div class="field field-actions"><button class="btn btn-primary btn-sm" type="submit">Search</button><button class="btn btn-ghost btn-sm" type="button" id="fClear">Clear</button></div>' +
     '</form>' +
     '<div class="section"><div id="browseResults" class="grid grid-2"></div></div>';
-  const run = async (resetSel) => {
+  const run = async () => {
     const params = new URLSearchParams();
     const q = $('#fQ').value.trim(); if (q) params.set('q', q);
     const p = $('#fProgram').value; if (p) params.set('program', p);
@@ -615,17 +615,27 @@ async function browseView() {
       const rows = await api('GET', '/api/opportunities' + (params.toString() ? '?' + params : ''));
       state.opps = rows;
       if (!rows.length) { holder.innerHTML = '<div class="empty">No opportunities found for these filters. Try adjusting them.</div>'; return; }
-      const shown = sel && !p ? rows.filter((o) => (o.programs || []).includes(sel)) : rows;
-      const list = shown.length ? shown : rows;
-      holder.innerHTML = '<div class="section-note" id="browseNote"></div>' + list.map((o) => oppCard(o)).join('');
-      if (shown.length && sel && !p) $('#browseNote').innerHTML = '<span>Showing <strong>' + shown.length + '</strong> opportunities relevant to your selected program. <a href="#/opportunities">Clear program</a> to see all.</span>';
-      else if ($('#browseNote')) $('#browseNote').remove();
+      // Only filter by program if user explicitly selected one in the dropdown
+      const programFilter = $('#fProgram').value;
+      const list = programFilter ? rows.filter((o) => (o.programs || []).includes(programFilter)) : rows;
+      const displayList = list.length ? list : rows;
+      holder.innerHTML = '<div class="section-note" id="browseNote"></div>' + displayList.map((o) => oppCard(o)).join('');
+      // Show appropriate message based on whether program was selected
+      const note = $('#browseNote');
+      if (note) {
+        if (programFilter) {
+          const progObj = (cat.program_options || []).find((o) => o.value === programFilter);
+          const progName = progObj ? progObj.label : programFilter;
+          note.innerHTML = '<span>Showing <strong>' + list.length + '</strong> opportunities relevant to <strong>' + esc(progName) + '</strong>.</span>';
+        } else {
+          note.innerHTML = '<span>Showing <strong>' + list.length + '</strong> internship opportunities.</span>';
+        }
+      }
       bindCards(holder);
     } catch (err) { holder.innerHTML = '<div class="empty">' + esc(err.message) + '</div>'; }
   };
-  if (sel) $('#fProgram').value = '';
   $('#filterForm').addEventListener('submit', (e) => { e.preventDefault(); run(); });
-  $('#fClear').addEventListener('click', () => { $('#filterForm').reset(); $('#fProgram').value = sel || ''; run(); });
+  $('#fClear').addEventListener('click', () => { $('#filterForm').reset(); run(); });
   run();
 }
 /* ============================== COMPANIES DIRECTORY ============================== */
@@ -782,3 +792,39 @@ async function boot() {
 }
 
 boot();
+
+/* ============================== THEME TOGGLE ============================== */
+function initThemeToggle() {
+  const toggle = $('#themeToggle');
+  const icon = $('#themeIcon');
+  if (!toggle || !icon) return;
+
+  const SUN_PATH = '<circle cx="12" cy="12" r="4" stroke="currentColor" fill="none"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
+  const MOON_PATH = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('internix.theme', theme);
+    if (theme === 'dark') {
+      icon.innerHTML = MOON_PATH;
+      toggle.setAttribute('aria-label', 'Switch to light mode');
+    } else {
+      icon.innerHTML = SUN_PATH;
+      toggle.setAttribute('aria-label', 'Switch to dark mode');
+    }
+  }
+
+  function getTheme() {
+    return document.documentElement.getAttribute('data-theme') || 'light';
+  }
+
+  toggle.addEventListener('click', () => {
+    const current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // Set initial state
+  setTheme(getTheme());
+}
+
+initThemeToggle();

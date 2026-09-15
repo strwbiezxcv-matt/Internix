@@ -1,0 +1,28 @@
+CSS rules parsed: 350
+light vars: 34  dark vars: 29
+
+=== LOW CONTRAST (text vs effective background, < 4.5:1) ===
+[light] div.match-card div.match-badge  ratio=1.06  color=#fff  bg=fallback var(--bg)
+[light] div.pills button.pill.active  ratio=1.06  color=#fff  bg=fallback var(--bg)
+
+=== UNDEFINED VARIABLES ===
+none
+
+=== HARDCODED COLOURS WITHOUT A DARK OVERRIDE (14) ===
+.btn-primary { color: #fff; box-shadow: 0 2px 8px rgba(36, 158, 86, 0.28) }
+.btn-primary:hover { box-shadow: 0 3px 12px rgba(36, 158, 86, 0.34) }
+.tag.warn { border-color: #f3e3bd }
+.pill.active { color: #fff }
+.save-btn.on { color: #fff }
+.field select:focus,.filter-bar select:focus,.hero-select:focus,select.select-lg:focus { box-shadow: 0 0 0 3px rgba(36, 158, 86, 0.16) }
+.toast { color: #fff }
+.skeleton { background: linear-gradient(90deg, #edf2ee 25%, #f6f9f6 50%, #edf2ee 75%) }
+.prog-check .check-box { border: 2px solid #b9cdbc }
+.prog-check.on .check-box::after { color: #fff }
+select:focus, input:focus { box-shadow: 0 0 0 3px rgba(47,181,102,0.16) }
+.why-badge.no { border-color: #e5b4b0; background: #fdf0ef; color: #8f2f2a }
+.hero-select:focus { box-shadow: 0 0 0 3px rgba(47,181,102,0.16) }
+.match-badge { color: #fff }
+
+=== WIDE FIXED WIDTHS >= 300px (0) ===
+none

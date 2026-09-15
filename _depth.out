@@ -1,0 +1,42 @@
+final depth=0
+=== rules mentioning label / field / filter (with depth) ===
+L405 d0->1 | /* ------------------------------ forms ------------------------------ */.field label {
+L418 d0->1 | input, select {
+L429 d0->1 | input:focus, select:focus {
+L684 d0->1 | .why-label {
+L791 d0->1 | /* ---------- modern dropdown system (fix text overlap, narrow widths) ---------- */.field select,.filter-bar 
+L816 d0->1 | [data-theme="dark"] .field select,[data-theme="dark"] .filter-bar select,[data-theme="dark"] .hero-select,[dat
+L819 d0->1 | .field select:hover,.filter-bar select:hover,.hero-select:hover,select.select-lg:hover {
+L823 d0->1 | .field select:focus,.filter-bar select:focus,.hero-select:focus,select.select-lg:focus {
+L829 d0->1 | .field select option,.filter-bar select option,.hero-select option,select.select-lg option {
+L838 d0->1 | select.select-lg,.hero-select {
+L973 d0->1 | .section-label {
+L1113 d0->1 | .detail-label {
+L1236 d1->2 | .filter-bar {
+L1239 d1->2 | .filter-bar .q-field {
+L1242 d1->2 | .filter-bar .field-actions {
+L1289 d1->2 | .filter-bar {
+L1292 d1->2 | .filter-bar .q-field, .filter-bar .field-actions {
+L1402 d0->1 | .section-label::after {
+L1481 d0->1 | .prog-check .check-label {
+L1525 d0->1 | .filter-bar {
+L1537 d0->1 | .filter-bar .q-field {
+L1540 d0->1 | .field-actions {
+L1625 d0->1 | select {
+L1649 d0->1 | select::-ms-expand {
+L1652 d0->1 | select option {
+L1660 d0->1 | select:hover {
+L1663 d0->1 | .field select, .filter-bar select,.field input, .filter-bar input {
+L1667 d0->1 | select:focus, input:focus {
+L1713 d0->1 | .multi-select-btn .ms-label {
+L1799 d0->1 | .hero-program-form label {
+L1908 d0->1 | .why-label {
+L1962 d0->1 | .hero-loc-block > label {
+L1980 d0->1 | .form-row .field {
+L2037 d1->2 | .filter-bar {
+L2058 d1->2 | .filter-bar {
+L2062 d1->2 | .field-actions {
+L2066 d1->2 | .field-actions .btn {
+L2069 d1->2 | select, .multi-select-btn {
+L2104 d0->1 | select optgroup option {
+L2111 d0->1 | select option {

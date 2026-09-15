@@ -1,0 +1,356 @@
+===== COMMENTS =====
+1: /* ============================================================ Internix — Student Internship Discovery + Comp
+38: /* ---------- Dark Mode ---------- */
+96: /* ------------------------------ topbar ------------------------------ */
+186: /* Theme toggle button */
+218: /* ------------------------------ buttons ------------------------------ */
+257: /* ------------------------------ hero ------------------------------ */
+314: /* floating mini-cards (subtle) */
+370: /* ------------------------------ sections ------------------------------ */
+405: /* ------------------------------ forms ------------------------------ */
+433: /* ------------------------------ tags / pills ------------------------------ */
+503: /* ------------------------------ cards ------------------------------ */
+603: /* card address line */
+611: /* ------------------------------ match results ------------------------------ */
+717: /* match tiers */
+772: /* ---------- program multi-select (Find My Matches) ---------- */
+791: /* ---------- modern dropdown system (fix text overlap, narrow widths) ---------- */
+843: /* ------------------------------ stats / features ------------------------------ */
+875: /* Comfortable, intentional gap between "Browse by Program" and the Discover / Match by program / Apply on the
+941: /* ------------------------------ company detail (modal) ------------------------------ */
+981: /* ------------------------------ modal / toast ------------------------------ */
+1040: /* --- redesigned View Details sheet --- */
+1179: /* ------------------------------ states ------------------------------ */
+1229: /* ------------------------------ footer ------------------------------ */ | /* ------------------------------
+1488: /* small opportunity rows (inside company detail) */
+1512: /* --- multi-program checkbox (accessible native control) --- */
+1551: /* ------------------------------ grids ------------------------------ */
+1622: /* ============================================================ Shared layout & control polish Completes the d
+1678: /* Multi-program picker: checkbox dropdown, one centralized control used by Find My Matches */
+1762: /* Match explanation badges: WHY a company matched (program / location) */
+1790: /* --- landing hero program form --- */
+1863: /* Match cards: consistent badges + grouped openings (no duplicate company spam) */
+1945: /* --- landing hero CTA row (template uses the singular .hero-cta) --- */
+1957: /* Landing location (optional) block — kept apart from the CTA row below. */
+1974: /* --- two-up form row (Find My Matches) --- */
+1987: /* --- matches view container + reason checklist --- */
+2011: /* --- empty state icon (saved / no results) --- */
+2018: /* --- guarantee comfortable click targets on card action rows --- */
+2021: /* --- responsive refinements for the new pieces --- */
+2080: /* ============================================================ Cozy + modern polish — soft glass surfaces, re
+2098: /* optgroup headers inside grouped location dropdowns — clear Bulacan vs Metro */
+2115: /* Slightly roomier, friendlier inputs */
+
+===== BLOCK SELECTORS =====
+39: [data-theme="dark"] {
+75: html {
+78: body {
+89: main {
+106: .topbar-inner {
+115: .logo {
+127: .logo:hover {
+130: .logo .mark {
+140: .logo:hover .mark {
+143: .logo .mark.sm {
+150: fill the square mark (contain = never stretched/cropped) and follow the container radius. */.logo .m
+156: .topnav {
+161: .topnav .link {
+173: .topnav .link:hover {
+178: .topnav .link.active {
+183: .topbar .spacer {
+201: .theme-toggle:hover {
+206: .theme-toggle:focus-visible {
+210: .theme-toggle svg {
+215: .nav-toggle {
+237: .btn:hover {
+240: .btn:active {
+243: .btn-primary {
+248: .btn-primary:hover {
+252: .btn-outline {
+263: .hero-eyebrow {
+276: .hero-eyebrow .dot {
+282: .hero h1 {
+289: .hero h1 em {
+296: .hero-sub {
+303: .hero-ctas {
+309: .hero-ctas .btn {
+319: .orb {
+335: .orb .dot {
+342: .orb.o1 {
+347: .orb.o2 {
+352: .orb.o3 {
+357: .orb.o4 {
+373: .section-head {
+381: .section-head h2 {
+384: .section-note {
+388: .section-note a {
+391: .page-head {
+394: .page-head h1 {
+397: .page-sub {
+402: .link {
+413: .hint {
+418: input, select {
+429: input:focus, select:focus {
+444: .tag.neutral {
+449: .tag.warn {
+454: .tag-row {
+460: .pills {
+465: .pill {
+477: .pill:hover {
+481: .pill.active {
+486: .prog-bubble {
+498: .prog-bubble:hover {
+514: .opp-card:hover, .company-card:hover {
+519: .opp-card-top {
+524: .opp-position {
+531: .opp-company {
+536: .opp-meta {
+541: .opp-meta.loc {
+546: .opp-actions {
+553: .card-desc {
+557: .muted {
+560: .logo-badge {
+575: .logo-badge img {
+580: .save-btn {
+593: .save-btn:hover {
+598: .save-btn.on {
+625: .result-count strong {
+628: .match-list {
+633: .match-card {
+644: .match-card:hover {
+648: .match-card-top {
+655: .match-badge {
+670: .match-badge .lbl {
+677: .why-box {
+684: .why-label {
+692: .why-text {
+696: .score {
+701: .score .bar {
+709: .score .bar i {
+720: .tier-head {
+727: .tier-title {
+735: .tier-dot {
+741: .tier-best .tier-dot {
+744: .tier-good .tier-dot {
+747: .tier-potential .tier-dot {
+750: .tier-count {
+759: .tier-good .tier-count {
+763: .tier-potential .tier-count {
+768: .tier-blurb {
+778: .prog-check {
+816: [data-theme="dark"] .field select,[data-theme="dark"] .filter-bar select,[data-theme="dark"] .hero-s
+819: .field select:hover,.filter-bar select:hover,.hero-select:hover,select.select-lg:hover {
+823: .field select:focus,.filter-bar select:focus,.hero-select:focus,select.select-lg:focus {
+829: .field select option,.filter-bar select option,.hero-select option,select.select-lg option {
+838: select.select-lg,.hero-select {
+849: .stat-card {
+857: .stat-card .num {
+865: .stat-card .lbl {
+870: .feature-row {
+878: .browse-section {
+881: .feature-card {
+889: .feature-card:hover {
+893: .feature-card .icon {
+906: .feature-card p {
+911: .how-it-works {
+920: .how-it-works ol {
+928: .how-it-works h2 {
+931: .how-it-works p {
+936: .about-grid {
+947: .detail-head .logo-badge {
+953: .detail-head h2 {
+958: .detail-industry {
+964: .detail-loc {
+970: .detail-loc .card-addr {
+973: .section-label {
+993: .modal-overlay[hidden] {
+996: .modal {
+1008: from {
+1012: to {
+1017: .modal .close-x {
+1032: .modal .close-x:hover {
+1036: .modal h2 {
+1044: from {
+1047: to {
+1051: .detail-sheet {
+1054: .detail-head {
+1059: .detail-logo {
+1074: .detail-logo img {
+1079: .detail-name {
+1087: .detail-role {
+1093: .detail-desc {
+1099: .detail-address {
+1107: .detail-address .d-ico {
+1110: .detail-progs, .detail-openings {
+1113: .detail-label {
+1122: .detail-cta {
+1129: .detail-note {
+1133: .detail-openings .d-chevy {
+1137: .modal {
+1140: .detail-logo {
+1144: .detail-name {
+1147: .detail-role {
+1151: .toast {
+1166: .toast.err {
+1170: from {
+1174: to {
+1188: .empty h3 {
+1193: .empty p {
+1196: .skeleton {
+1211: .skeleton .sk-row {
+1217: .skeleton .sk-row.w60 {
+1220: .skeleton .sk-row.w40 {
+1223: .skeleton .sk-logo {
+1230: .grid-3 {
+1233: .feature-row {
+1236: .filter-bar {
+1239: .filter-bar .q-field {
+1242: .filter-bar .field-actions {
+1248: .hero-ctas .btn {
+1251: .stats-row {
+1256: .topbar-inner {
+1261: .nav-toggle {
+1274: .topnav {
+1282: .topnav.open {
+1285: .topnav .link {
+1289: .filter-bar {
+1292: .filter-bar .q-field, .filter-bar .field-actions {
+1295: .location-row {
+1298: .grid-2 {
+1301: .stats-row {
+1305: .match-card-top {
+1308: .info-row .k {
+1313: main {
+1316: .grid-3, .feature-row {
+1319: .hero {
+1322: .hero-ctas .btn {
+1326: .orb {
+1329: .match-list {
+1332: .modal {
+1335: .detail-head {
+1338: .match-badge {
+1342: .match-badge .lbl {
+1347: .orb {
+1350: .opp-card:hover, .company-card:hover, .match-card:hover, .feature-card:hover {
+1353: .match-card-top .score .bar i {
+1356: html {
+1360: .site-footer {
+1368: .footer-inner {
+1376: .footer-brand {
+1385: .footer-note {
+1389: .footer-links {
+1395: .footer-links a {
+1398: .footer-copy {
+1402: .section-label::after {
+1408: .detail-desc {
+1412: .info-row {
+1420: .info-row .k {
+1426: .info-row .v {
+1430: .verify-grid {
+1435: .modal-actions {
+1442: .modal-footnote {
+1447: .prog-check:hover {
+1450: .prog-check.on {
+1454: .prog-check input {
+1459: .prog-check .check-box {
+1471: .prog-check.on .check-box {
+1475: .prog-check.on .check-box::after {
+1481: .prog-check .check-label {
+1484: .card-addr .pin {
+1492: .small-opp {
+1503: .small-opp:last-child {
+1506: .small-opp:hover {
+1509: .small-opp .opp-position {
+1517: .prog-multi summary {
+1525: .filter-bar {
+1537: .filter-bar .q-field {
+1540: .field-actions {
+1546: .location-row {
+1555: .grid-2 {
+1558: .grid-3 {
+1561: .btn-outline:hover {
+1566: .btn-ghost {
+1570: .btn-ghost:hover {
+1574: .btn-lg {
+1579: .btn-sm {
+1585: .btn-block {
+1588: .btn:disabled {
+1592: h1, h2, h3 {
+1597: h1 {
+1601: h2 {
+1605: h3 {
+1609: a {
+1613: a:hover {
+1616: img {
+1619: ::placeholder {
+1625: select {
+1649: select::-ms-expand {
+1652: select option {
+1660: select:hover {
+1663: .field select, .filter-bar select,.field input, .filter-bar input {
+1667: select:focus, input:focus {
+1672: .select-lg {
+1682: .multi-select-btn {
+1706: .multi-select-btn:hover {
+1709: .multi-select-btn:focus-visible {
+1713: .multi-select-btn .ms-label {
+1720: .multi-select-panel {
+1734: .multi-select-panel[hidden] {
+1737: .ms-option {
+1748: .ms-option:hover {
+1751: .ms-option input {
+1758: .ms-option span {
+1768: .why-badge {
+1782: .why-badge.no {
+1787: .why-badge .tick {
+1799: .hero-program-form label {
+1804: .hero-select-row {
+1812: .hero-select {
+1838: .hero-select:hover {
+1841: .hero-select:focus {
+1846: .hero-select option {
+1849: .hero-program-form .btn {
+1853: .prog-bubbles {
+1860: .prog-bubble {
+1868: .match-card {
+1875: .match-card-top {
+1880: .match-badge {
+1889: .match-badge .pct {
+1895: .match-badge .lbl {
+1901: .why-box {
+1908: .why-label {
+1916: .tag-row {
+1922: .tag {
+1934: .tag.neutral {
+1939: .opp-actions {
+1952: .hero-cta .btn {
+1962: .hero-loc-block > label {
+1970: .hero-loc-block .hint {
+1980: .form-row .field {
+1983: .card-narrow {
+1990: .check-list {
+1998: .check-list li {
+2002: .check-list li.ok {
+2005: .check-list li.no {
+2008: .check-list li.part {
+2022: .hero-select-row {
+2027: .hero-select {
+2031: .hero-program-form .btn {
+2034: .form-row {
+2037: .filter-bar {
+2042: .form-row {
+2045: .hero-select {
+2051: .hero-cta .btn {
+2055: .prog-bubbles {
+2058: .filter-bar {
+2062: .field-actions {
+2066: .field-actions .btn {
+2069: select, .multi-select-btn {
+2073: .match-card-top {
+2076: .match-badge {
+2086: .opp-card:hover, .company-card:hover, .match-card:hover, .feature-card:hover {
+2090: .topbar {
+2093: .modal {
+2104: select optgroup option {
+2111: select option {
+2118: :focus-visible {

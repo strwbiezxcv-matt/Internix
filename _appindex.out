@@ -1,0 +1,78 @@
+20: function esc(v) {
+26: async function api(method, path, body) {
+44: function fmtDate(d) {
+51: function initials(name) {
+55: function logoHTML(name, logoUrl) {
+61: function programNames(list) {
+66: function getSavedCompanyIds() {
+69: function setSavedCompanyIds(ids) {
+72: function isSavedCompany(id) { return getSavedCompanyIds().includes(+id); }
+73: function toggleSavedCompany(id) {
+82: function toast(msg, isErr) {
+89: function openModal(html) {
+94: function closeModal() {
+104: function go(hash) { location.hash = hash; }
+106: function renderNav() {
+128: /* ---------------------- selected program (localStorage) ---------------------- */
+130: function saveProfile(p) { localStorage.setItem('internix.profile', JSON.stringify(p || {})); state.profile = p; }
+131: function loadProfile() {
+134: const PROG_KEY = 'internix.selectedProgram';
+135: function getStoredProgram() { try { return localStorage.getItem(PROG_KEY); } catch { return null; } }
+136: function setStoredProgram(code) { try { if (code) localStorage.setItem(PROG_KEY, code); else localStorage.removeItem(PROG_KEY); } catch {} }
+137: function selectedProgram() { return state.profile && state.profile.program ? state.profile.program : (getStoredProgram() || null); }
+138: function selectedPrograms() {
+139: if (state.profile && Array.isArray(state.profile.programs) && state.profile.programs.length) return state.profile.programs.slice();
+140: const single = selectedProgram();
+143: function programLabel(code) {
+144: const o = (state.catalog && state.catalog.program_options || []).find((x) => x.value === code);
+148: function programLabels(codes) { return (codes || []).map(programLabel); }
+149: function selectedLocation() { return (state.profile && state.profile.location) || ''; }
+151: function locationLabel(v) { return v || ''; }
+152: function opportunityLocation(o) {
+160: function clientMatch(o, selectedProgramsArg, selectedLocationArg) {
+161: const sel = (selectedProgramsArg || []).filter(Boolean);
+167: const opts = (state.catalog && state.catalog.program_options) || [];
+187: function sameLocationFilter(o, loc) {
+192: function programOptionsHtml(selected, placeholder) {
+193: const opts = (state.catalog && state.catalog.program_options) || [];
+202: function locationOptionsHtml(selected, placeholder, empty) {
+217: function arrangementOptionsHtml(selected) {
+222: function isHttp(u) {
+225: function isWeb(u) {
+228: function detailLogo(name, url) {
+233: function pickOppLink(o) {
+245: function pickCompanyLink(c) {
+260: function detailSheet(o) {
+278: function oppCard(o, showScore) {
+303: function bindCards(root) {
+308: async function openDetail(id) {
+330: function companyCard(c, index) {
+351: async function openCompanyDetail(id) {
+387: function landingView() {
+388: const options = state.catalog ? (state.catalog.program_options || []) : [];
+390: // Previously selected programs still drive other sections via state.profile, but the
+439: const cur = state.profile || {};
+451: function matchView() {
+454: const p = state.profile || {};
+455: const options = cat.program_options || [];
+501: try { localStorage.setItem('internix.selectedPrograms', JSON.stringify(codes)); } catch {}
+506: state.profile = d.profile;
+513: function matchesView() {
+538: '<p>Based on your selected program' + (progNames.length > 1 ? 's' : '') + ': <strong>' + esc(progNames.join(' + ')) + '</strong>' +
+588: async function browseView() {
+598: '<div class="field"><label>Program</label><select id="fProgram"><option value="">All programs</option>' + (cat.program_options || []).map(opt).join(''
+608: const p = $('#fProgram').value; if (p) params.set('program', p);
+619: const programFilter = $('#fProgram').value;
+627: const progObj = (cat.program_options || []).find((o) => o.value === programFilter);
+642: async function companiesView() {
+652: const progObj = filter.program ? (cat ? (cat.program_options || []).find((o) => o.value === filter.program) : null) : null;
+689: const progOpts = (cat ? cat.program_options : []).map((o) => '<option value="' + esc(o.value) + '">' + esc(o.label) + '</option>').join('');
+705: function savedView() {
+743: function aboutView() {
+746: const optCount = state.catalog ? (state.catalog.program_options || []).length : 0;
+759: (state.catalog ? state.catalog.program_options.map((o) => '<span class="tag">' + esc(o.label) + '</span>').join('') : '') + '</div></section>' +
+776: async function route() {
+784: async function boot() {
+785: try { state.catalog = await api('GET', '/api/catalog'); } catch { state.catalog = { programs: [], program_options: [], skills: [], fields: [], locatio
+789: if (sp && sp.program) state.profile = sp;
+797: function initThemeToggle() {

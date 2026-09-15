@@ -1,0 +1,21 @@
+14: profile: null,      // { program, program_name, specialization, location, work_arrangement }
+130: function saveProfile(p) { localStorage.setItem('internix.profile', JSON.stringify(p || {})); state.profile = p; }
+163: const oppNames = (o.program_names || o.relevant_programs || []).map((s) => String(s || '').toLowerCase());
+202: function locationOptionsHtml(selected, placeholder, empty) {
+312: const progs = (o.program_names && o.program_names.length)
+313: ? o.program_names
+356: const progs = (d.relevant_program_names && d.relevant_program_names.length)
+357: ? d.relevant_program_names
+410: '<div class="hero-select-row"><select id="heroLocation" class="hero-select" aria-label="Preferred location">' + locationOptionsHtml(savedLoc, 'All loc
+424: '<section class="how-it-works"><h2>How Internix Works</h2><ol><li>Select your academic program (or browse freely).</li><li>Internix ranks internships 
+473: '<select id="locSelect">' + locationOptionsHtml(locSel, 'All locations') + '</select></div>' +
+506: state.profile = d.profile;
+516: const progNames = profile.program_names || (profile.program_name ? [profile.program_name] : (profile.program ? [profile.program] : []));
+524: const progs = (o.program_names || []).slice(0, 2).map((p) => '<span class="tag">' + esc(p) + '</span>').join('');
+574: '<div class="field"><label>Location</label><select id="matchLoc">' + locationOptionsHtml(filters.loc, 'Any') + '</select></div>' +
+588: async function browseView() {
+599: '<div class="field"><label>Location</label><select id="fLocation">' + locationOptionsHtml('', 'All locations') + '</select></div>' +
+629: note.innerHTML = '<span>Showing <strong>' + list.length + '</strong> opportunities relevant to <strong>' + esc(progName) + '</strong>.</span>';
+642: async function companiesView() {
+694: '<div class="field"><label>Location</label><select id="cProvince">' + locationOptionsHtml(filter.province, 'All locations') + '</select></div>' +
+789: if (sp && sp.program) state.profile = sp;

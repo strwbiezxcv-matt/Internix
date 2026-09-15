@@ -1,0 +1,27 @@
+audit.js lines=492
+--- last 25 ---
+  if (!colourDecls.length) continue;
+  if (hasDarkOverride(r.selector)) continue;
+  hardcoded.push(r.selector + ' { ' + colourDecls.map((d) => d.prop + ': ' + d.value).join('; ') + ' }');
+}
+lines.push('');
+lines.push('=== HARDCODED COLOURS WITHOUT A DARK OVERRIDE (' + hardcoded.length + ') ===');
+lines.push(hardcoded.length ? hardcoded.join('\n') : 'none');
+
+/* ---- important / !important and fixed-width heuristics ---- */
+const narrow = [];
+for (const r of RULES) {
+  if (r.atRule || !r.selector) continue;
+  for (const d of declarations(r.body)) {
+    if (/^(min-width|width)$/.test(d.prop) && /px$/.test(d.value)) {
+      const px = parseFloat(d.value);
+      if (px >= 300) narrow.push(r.selector + ' { ' + d.prop + ': ' + d.value + ' }');
+    }
+  }
+}
+lines.push('');
+lines.push('=== WIDE FIXED WIDTHS >= 300px (' + narrow.length + ') ===');
+lines.push(narrow.length ? narrow.join('\n') : 'none');
+
+fs.writeFileSync(path.join(ROOT, '_audit.out'), lines.join('\n'), 'utf8');
+console.log(lines.join('\n'));

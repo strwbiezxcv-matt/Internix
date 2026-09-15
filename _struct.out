@@ -1,0 +1,53 @@
+1: /* ============================================================ Internix — Student Internship Discovery + Comp
+38: /* ---------- Dark Mode ---------- */
+96: /* ------------------------------ topbar ------------------------------ */.topbar {
+149: /* Internix icon is now the branding raster image;
+186: /* Theme toggle button */.theme-toggle {
+218: /* ------------------------------ buttons ------------------------------ */.btn {
+257: /* ------------------------------ hero ------------------------------ */.hero {
+314: /* floating mini-cards (subtle) */.hero-orbs {
+362: @keyframes floaty {
+370: /* ------------------------------ sections ------------------------------ */.section {
+405: /* ------------------------------ forms ------------------------------ */.field label {
+433: /* ------------------------------ tags / pills ------------------------------ */.tag {
+503: /* ------------------------------ cards ------------------------------ */.opp-card, .company-card {
+603: /* card address line */.card-addr {
+611: /* ------------------------------ match results ------------------------------ */.result-count {
+717: /* match tiers */.tier-section {
+772: /* ---------- program multi-select (Find My Matches) ---------- */.prog-check-grid {
+791: /* ---------- modern dropdown system (fix text overlap, narrow widths) ---------- */.field select,.filter-bar 
+843: /* ------------------------------ stats / features ------------------------------ */.stats-row {
+875: /* Comfortable, intentional gap between "Browse by Program" and the Discover / Match by program / Apply on the
+941: /* ------------------------------ company detail (modal) ------------------------------ */.detail-head {
+981: /* ------------------------------ modal / toast ------------------------------ */.modal-overlay {
+1007: @keyframes modal-in {
+1040: /* --- redesigned View Details sheet --- */.modal-overlay {
+1043: @keyframes overlay-in {
+1136: @media (max-width: 520px) {
+1169: @keyframes toast-in {
+1179: /* ------------------------------ states ------------------------------ */.empty {
+1203: @keyframes sk {
+1229: /* ------------------------------ footer ------------------------------ *//* ------------------------------ re
+1247: @media (max-width: 900px) {
+1255: @media (max-width: 760px) {
+1312: @media (max-width: 640px) {
+1346: @media (prefers-reduced-motion: reduce) {
+1488: /* small opportunity rows (inside company detail) */.small-opp-list {
+1512: /* --- multi-program checkbox (accessible native control) --- */.prog-multi {
+1551: /* ------------------------------ grids ------------------------------ */.grid {
+1622: /* ============================================================ Shared layout & control polish Completes the d
+1678: /* Multi-program picker: checkbox dropdown, one centralized control used by Find My Matches */.multi-select {
+1762: /* Match explanation badges: WHY a company matched (program / location) */.why-badges {
+1790: /* --- landing hero program form --- */.hero-program-form {
+1863: /* Match cards: consistent badges + grouped openings (no duplicate company spam) */.match-list {
+1945: /* --- landing hero CTA row (template uses the singular .hero-cta) --- */.hero-cta {
+1957: /* Landing location (optional) block — kept apart from the CTA row below. */.hero-loc-block {
+1974: /* --- two-up form row (Find My Matches) --- */.form-row {
+1987: /* --- matches view container + reason checklist --- */.match-summary {
+2011: /* --- empty state icon (saved / no results) --- */.empty-icon {
+2018: /* --- guarantee comfortable click targets on card action rows --- */.opp-actions .btn, .match-card .btn {
+2021: /* --- responsive refinements for the new pieces --- */@media (max-width: 1024px) {
+2041: @media (max-width: 760px) {
+2080: /* ============================================================ Cozy + modern polish — soft glass surfaces, re
+2098: /* optgroup headers inside grouped location dropdowns — clear Bulacan vs Metro */select optgroup {
+2115: /* Slightly roomier, friendlier inputs */input, select {

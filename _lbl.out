@@ -1,0 +1,27 @@
+405: /* ------------------------------ forms ------------------------------ */.field label {
+684: .why-label {
+791: /* ---------- modern dropdown system (fix text overlap, narrow widths) ---------- */.field select,.filter-bar select,.hero-select,select.select-lg {
+816: [data-theme="dark"] .field select,[data-theme="dark"] .filter-bar select,[data-theme="dark"] .hero-select,[data-theme="dark"] select.select-lg {
+819: .field select:hover,.filter-bar select:hover,.hero-select:hover,select.select-lg:hover {
+823: .field select:focus,.filter-bar select:focus,.hero-select:focus,select.select-lg:focus {
+829: .field select option,.filter-bar select option,.hero-select option,select.select-lg option {
+973: .section-label {
+1113: .detail-label {
+1236: .filter-bar {
+1239: .filter-bar .q-field {
+1242: .filter-bar .field-actions {
+1289: .filter-bar {
+1292: .filter-bar .q-field, .filter-bar .field-actions {
+1402: .section-label::after {
+1481: .prog-check .check-label {
+1525: .filter-bar {
+1537: .filter-bar .q-field {
+1619: ::placeholder {
+1663: .field select, .filter-bar select,.field input, .filter-bar input {
+1713: .multi-select-btn .ms-label {
+1799: .hero-program-form label {
+1908: .why-label {
+1962: .hero-loc-block > label {
+2037: .filter-bar {
+2058: .filter-bar {
+2080: /* ============================================================ Cozy + modern polish — soft glass surfaces, refined borders, gentle hover feedback. Tasteful green accents, no gimmicks. ============================================================ */.opp-card, .company-card, .match-card, .feature-card,.how-it-works, .stat-card, .detail-card, .match-summary .filter-bar {

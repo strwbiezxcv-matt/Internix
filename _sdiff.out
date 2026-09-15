@@ -1,0 +1,135 @@
+HEAD selectors=334  CUR selectors=343
+
+=== SELECTORS ONLY IN CURRENT (9) ===
+[data-theme="dark"]
+.theme-toggle
+.theme-toggle:hover
+.theme-toggle:focus-visible
+.theme-toggle svg
+[data-theme="dark"] .field select
+[data-theme="dark"] .filter-bar select
+[data-theme="dark"] .hero-select
+[data-theme="dark"] select.select-lg
+
+=== SELECTORS ONLY IN HEAD (0) ===
+
+=== DECLARATION CHANGES ON SHARED SELECTORS ===
+:root
+  --overlay: HEAD[-] -> CUR[rgba(14, 26, 19, 0.5)]
+  --modal-bg: HEAD[-] -> CUR[rgba(255, 255, 255, 0.96)]
+  --topbar-bg: HEAD[-] -> CUR[rgba(255, 255, 255, 0.88)]
+  --card-bg: HEAD[-] -> CUR[rgba(255, 255, 255, 0.86)]
+  --card-border: HEAD[-] -> CUR[#eaf1ec]
+  --card-hover-border: HEAD[-] -> CUR[#cfe2d6]
+  --orb-bg: HEAD[-] -> CUR[rgba(255, 255, 255, 0.92)]
+  --close-x-bg: HEAD[-] -> CUR[var(--bg)]
+  --select-opt-bg: HEAD[-] -> CUR[#fff]
+  --transition-speed: HEAD[-] -> CUR[0.2s]
+body
+  transition: HEAD[-] -> CUR[background var(--transition-speed) ease, color var(--transition-speed) ease]
+.topbar
+  background: HEAD[rgba(255, 255, 255, 0.72)] -> CUR[var(--topbar-bg)]
+.logo
+  transition: HEAD[-] -> CUR[color var(--transition-speed) ease]
+.btn
+  transition: HEAD[background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.12s] -> CUR[background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.12s, background var(--transition-speed) ease, color var(--transition-speed) ease]
+.orb
+  background: HEAD[rgba(255, 255, 255, 0.92)] -> CUR[var(--orb-bg)]
+  transition: HEAD[-] -> CUR[background var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease]
+.field label
+  transition: HEAD[-] -> CUR[color var(--transition-speed) ease]
+.opp-card
+  background: HEAD[rgba(255, 255, 255, 0.86)] -> CUR[var(--card-bg)]
+  border-color: HEAD[#eaf1ec] -> CUR[var(--card-border)]
+.company-card
+  background: HEAD[rgba(255, 255, 255, 0.86)] -> CUR[var(--card-bg)]
+  border-color: HEAD[#eaf1ec] -> CUR[var(--card-border)]
+.opp-card:hover
+  border-color: HEAD[#cfe2d6] -> CUR[var(--card-hover-border)]
+.company-card:hover
+  border-color: HEAD[#cfe2d6] -> CUR[var(--card-hover-border)]
+.opp-position
+  color: HEAD[-] -> CUR[var(--ink)]
+.logo-badge
+  transition: HEAD[-] -> CUR[background var(--transition-speed) ease, color var(--transition-speed) ease]
+.result-count
+  transition: HEAD[-] -> CUR[background var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease]
+.match-card
+  background: HEAD[rgba(255, 255, 255, 0.86)] -> CUR[var(--card-bg)]
+  border-color: HEAD[#eaf1ec] -> CUR[var(--card-border)]
+.match-card:hover
+  border-color: HEAD[#cfe2d6] -> CUR[var(--card-hover-border)]
+.score .bar
+  transition: HEAD[-] -> CUR[background var(--transition-speed) ease]
+.tier-count
+  transition: HEAD[-] -> CUR[background var(--transition-speed) ease, color var(--transition-speed) ease]
+.prog-check
+  transition: HEAD[border-color 0.15s, background 0.15s] -> CUR[border-color 0.15s, background 0.15s, background var(--transition-speed) ease, color var(--transition-speed) ease]
+.hero-select
+  charset=utf-8,%3csvg xmlns='http: HEAD[//www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%23175230' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")] -> CUR[//www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%23a8b8ae' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")]
+.field select:hover
+  background-color: HEAD[#fff] -> CUR[var(--card)]
+.filter-bar select:hover
+  background-color: HEAD[#fff] -> CUR[var(--card)]
+select.select-lg:hover
+  background-color: HEAD[#fff] -> CUR[var(--card)]
+.field select:focus
+  background-color: HEAD[#fff] -> CUR[var(--card)]
+.filter-bar select:focus
+  background-color: HEAD[#fff] -> CUR[var(--card)]
+select.select-lg:focus
+  background-color: HEAD[#fff] -> CUR[var(--card)]
+.field select option
+  background: HEAD[#fff] -> CUR[var(--select-opt-bg)]
+.filter-bar select option
+  background: HEAD[#fff] -> CUR[var(--select-opt-bg)]
+select.select-lg option
+  background: HEAD[#fff] -> CUR[var(--select-opt-bg)]
+.stat-card
+  background: HEAD[rgba(255, 255, 255, 0.86)] -> CUR[var(--card-bg)]
+  border-color: HEAD[#eaf1ec] -> CUR[var(--card-border)]
+.stat-card .num
+  transition: HEAD[-] -> CUR[color var(--transition-speed) ease]
+.feature-card
+  background: HEAD[rgba(255, 255, 255, 0.86)] -> CUR[var(--card-bg)]
+  border-color: HEAD[#eaf1ec] -> CUR[var(--card-border)]
+.feature-card:hover
+  border-color: HEAD[#cfe2d6] -> CUR[var(--card-hover-border)]
+.feature-card .icon
+  transition: HEAD[-] -> CUR[background var(--transition-speed) ease, color var(--transition-speed) ease]
+.how-it-works
+  background: HEAD[rgba(255, 255, 255, 0.86)] -> CUR[var(--card-bg)]
+  border-color: HEAD[#eaf1ec] -> CUR[var(--card-border)]
+.detail-head h2
+  color: HEAD[-] -> CUR[var(--ink)]
+.modal
+  background: HEAD[rgba(255, 255, 255, 0.96)] -> CUR[var(--modal-bg)]
+.modal .close-x
+  background: HEAD[var(--bg)] -> CUR[var(--close-x-bg)]
+.modal h2
+  color: HEAD[-] -> CUR[var(--ink)]
+.detail-logo
+  transition: HEAD[-] -> CUR[background var(--transition-speed) ease, color var(--transition-speed) ease]
+.empty
+  transition: HEAD[-] -> CUR[background var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease]
+.skeleton .sk-row
+  background: HEAD[#e7ede8] -> CUR[var(--line)]
+.skeleton .sk-logo
+  background: HEAD[#e7ede8] -> CUR[var(--line)]
+.prog-check .check-box
+  background: HEAD[#fff] -> CUR[var(--select-opt-bg)]
+.filter-bar
+  background: HEAD[rgba(255, 255, 255, 0.9)] -> CUR[var(--card)]
+  backdrop-filter: HEAD[blur(14px) saturate(140%)] -> CUR[-]
+  -webkit-backdrop-filter: HEAD[blur(14px) saturate(140%)] -> CUR[-]
+  box-shadow: HEAD[var(--shadow)] -> CUR[var(--shadow-sm)]
+.multi-select-btn
+  charset=utf-8,%3csvg xmlns='http: HEAD[//www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%23175230' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")] -> CUR[//www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%23a8b8ae' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")]
+.detail-card
+  background: HEAD[rgba(255, 255, 255, 0.86)] -> CUR[var(--card-bg)]
+  border-color: HEAD[#eaf1ec] -> CUR[var(--card-border)]
+.match-summary .filter-bar
+  background: HEAD[rgba(255, 255, 255, 0.86)] -> CUR[var(--card-bg)]
+  border-color: HEAD[#eaf1ec] -> CUR[var(--card-border)]
+select optgroup option
+  background: HEAD[#fff] -> CUR[var(--select-opt-bg)]
