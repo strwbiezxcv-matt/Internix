@@ -18,6 +18,17 @@ const config = require('./config');
 const db = require('./db');
 const { Router } = require('./router');
 const { ok, fail, readJsonBody, parseQuery } = require('./util');
+const {
+  securityHeaders, rateLimiter, clientIp, boundedString, parseId
+} = require('./security');
+
+const isProd = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+const HEADERS = securityHeaders(isProd);
+
+// Generous limits: a student searching/filtering/browsing will never hit
+// these; they only stop abusive scripted hammering of the public API.
+const apiLimiter = rateLimiter({ windowMs: 60000, max: 300 });
+const matchLimiter = rateLimiter({ windowMs: 60000, max: 60 });
 
 const catalogRoutes = require('./routes/catalogRoutes');
 const opportunityRoutes = require('./routes/opportunityRoutes');
@@ -57,21 +68,26 @@ const MIME = {
 function serveStatic(urlPath, res) {
   let rel = urlPath === '/' ? '/index.html' : urlPath;
   const filePath = path.normalize(path.join(config.publicDir, rel));
-  if (!filePath.startsWith(config.publicDir)) {
-    res.writeHead(403); res.end('Forbidden'); return;
+  // Path traversal guard: the resolved path must stay INSIDE public/ — check
+  // the separator too so sibling directories (e.g. ".../public-evil") fail.
+  const withSep = config.publicDir.endsWith(path.sep)
+    ? config.publicDir
+    : config.publicDir + path.sep;
+  if (filePath !== config.publicDir && !filePath.startsWith(withSep)) {
+    res.writeHead(403, HEADERS); res.end('Forbidden'); return;
   }
   fs.readFile(filePath, (err, data) => {
     if (err) {
       // SPA fallback for client-side routes
       fs.readFile(path.join(config.publicDir, 'index.html'), (err2, indexData) => {
-        if (err2) { res.writeHead(404); res.end('Not found'); return; }
-        res.writeHead(200, { 'Content-Type': MIME['.html'] });
+        if (err2) { res.writeHead(404, HEADERS); res.end('Not found'); return; }
+        res.writeHead(200, { 'Content-Type': MIME['.html'], ...HEADERS });
         res.end(indexData);
       });
       return;
     }
     const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream', ...HEADERS });
     res.end(data);
   });
 }
@@ -80,16 +96,46 @@ function serveStatic(urlPath, res) {
 
 async function handleRequest(req, res) {
   const url = new URL(req.url, 'http://localhost');
-  const pathname = url.pathname;
-  const method = req.method;
+  let pathname = url.pathname;
+
+  // Reject path traversal / null bytes before anything else. `new URL()`
+  // already decodes %2e-style escapes, so a plain '..' check covers them.
+  if (pathname.includes('..') || pathname.includes('\x00')) {
+    res.writeHead(400, HEADERS); res.end('Bad request'); return;
+  }
 
   if (!pathname.startsWith('/api')) {
     serveStatic(pathname, res);
     return;
   }
 
+  /* ------------------------- API hardening ------------------------- */
+  // Security headers apply to API responses too (writeHead merges with these).
+  for (const [k, v] of Object.entries(HEADERS)) res.setHeader(k, v);
+  // Per-IP rate limiting (generous; see src/security.js).
+  const limit = pathname === '/api/match'
+    ? matchLimiter(clientIp(req))
+    : apiLimiter(clientIp(req));
+  if (limit.limited) {
+    res.writeHead(429, { 'Content-Type': 'application/json; charset=utf-8', ...HEADERS });
+    res.end(JSON.stringify({ ok: false, error: 'Too many requests. Please slow down and try again shortly.' }));
+    return;
+  }
+
+  // Sanitise query parameters server-side: bounded count, key and value
+  // lengths. Malicious or oversized inputs are clamped, never trusted.
+  const rawQuery = parseQuery(url.search.slice(1));
+  const query = {};
+  const keys = Object.keys(rawQuery).slice(0, 30);
+  for (const k of keys) {
+    const v = rawQuery[k];
+    query[boundedString(k, 64)] = Array.isArray(v)
+      ? v.slice(0, 10).map((x) => boundedString(x, 300))
+      : boundedString(v, 300);
+  }
+
   let body = {};
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
     try {
       body = await readJsonBody(req);
     } catch {
@@ -97,22 +143,30 @@ async function handleRequest(req, res) {
     }
   }
 
-  const match = router.match(method, pathname);
-  if (!match) return fail(res, 'Not found.', 404);
+  const match = router.match(req.method, pathname);
+  if (!match) {
+    // Distinguish "wrong method on an existing path" from "unknown path".
+    const others = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD']
+      .filter((m) => m !== req.method && router.match(m, pathname));
+    const status = others.length ? 405 : 404;
+    if (others.length) res.setHeader('Allow', others.join(', '));
+    return fail(res, status === 405 ? 'Method not allowed.' : 'Not found.', status);
+  }
 
   const ctx = {
     req,
     res,
     params: match.params,
-    query: parseQuery(url.search.slice(1)),
+    query,
     body
   };
 
   try {
     await match.handler(ctx);
   } catch (err) {
-    console.error('[error]', method, pathname, err);
-    if (!res.headersSent) fail(res, 'Internal server error.', 500);
+    // Full details stay in server logs only; the client gets a generic message.
+    console.error('[error]', req.method, pathname, err);
+    if (!res.headersSent) fail(res, 'Something went wrong. Please try again.', 500);
   }
 }
 

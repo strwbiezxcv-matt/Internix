@@ -17,6 +17,7 @@ const matching = require('../matching');
 const programMap = require('../programMap');
 const locations = require('../locations');
 const { ok, fail } = require('../util');
+const { boundedString } = require('../security');
 
 const DEMO_RE = /demo|sample|mock|placeholder|test company/i;
 
@@ -26,8 +27,9 @@ function norm(s) {
 
 function resolveProgram(value) {
   if (!value) return null;
-  // Accept internal code or full name.
-  const s = String(value).trim();
+  // Accept internal code or full name. Bounded length so oversized junk input
+  // can never reach the query layer.
+  const s = boundedString(value, 120);
   const row = db.get('SELECT id, code, name FROM programs WHERE code = ? OR lower(name) = lower(?)', s, s);
   return row ? { code: row.code, name: row.name } : null;
 }
@@ -36,6 +38,8 @@ function parsePrograms(body) {
   let list = body.programs || body.program;
   if (typeof list === 'string') list = [list];
   if (!Array.isArray(list)) list = [];
+  // Cap the number of selectable programs a single request may carry.
+  list = list.slice(0, 20);
   const resolved = [];
   const seen = new Set();
   for (const item of list) {
@@ -77,8 +81,8 @@ function register(router) {
       return fail(ctx.res, 'Please select at least one academic program.', 400);
     }
     const selected = programs.map((p) => p.code);
-    const selection = locations.resolveSelection(b.location || null);
-    const q = norm(b.search);
+    const selection = locations.resolveSelection(boundedString(b.location || '', 120) || null);
+    const q = norm(boundedString(b.search, 300));
 
     const all = loaders.loadAllOpenOpportunities().filter((o) => {
       if (o.is_expired) return false;

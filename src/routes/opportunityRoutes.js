@@ -11,6 +11,7 @@ const loaders = require('../loaders');
 const programMap = require('../programMap');
 const locations = require('../locations');
 const { ok, fail } = require('../util');
+const { parseId } = require('../security');
 
 function norm(s) {
   return String(s || '').trim().toLowerCase();
@@ -80,7 +81,8 @@ function register(router) {
 
   /* ------------------------- company detail (public) ------------------------- */
   router.get('/api/companies/:id', (ctx) => {
-    const id = parseInt(ctx.params.id, 10);
+    const id = parseId(ctx.params.id);
+    if (!id) return fail(ctx.res, 'Company not found.', 404);
     const c = db.get(
       'SELECT id, company_name, logo_url, description, address, location, city, municipality, province, region, industry, contact_info, website, official_website, official_website_verified, source_status, careers_url, company_size, year_established, verification_status, source_name, source_url, verified_at, internship_status, internship_notes, last_verified_at FROM companies WHERE id = ?',
       id
@@ -163,7 +165,8 @@ function register(router) {
 
   /* ------------------------- opportunity detail (public) ------------------------- */
   router.get('/api/opportunities/:id', (ctx) => {
-    const id = parseInt(ctx.params.id, 10);
+    const id = parseId(ctx.params.id);
+    if (!id) return fail(ctx.res, 'Opportunity not found.', 404);
     const opp = loaders.loadOpportunity(id);
     if (!opp) return fail(ctx.res, 'Opportunity not found.', 404);
     return ok(ctx.res, { opportunity: opp });

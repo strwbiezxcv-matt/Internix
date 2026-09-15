@@ -53,7 +53,8 @@ function initials(name) {
 }
 
 function logoHTML(name, logoUrl) {
-  if (logoUrl) return '<div class="logo"><img src="' + esc(logoUrl) + '" alt=""></div>';
+  // Only http(s) logos are rendered — mirrors the server-side URL sanitiser.
+  if (isHttp(logoUrl)) return '<div class="logo"><img src="' + esc(logoUrl) + '" alt=""></div>';
   return '<div class="logo">' + esc(initials(name)) + '</div>';
 }
 
@@ -281,7 +282,7 @@ function oppCard(o, showScore) {
     const label = programNames([p])[0] || p;
     return '<span class="tag">' + esc(label) + '</span>';
   }).join('');
-  const sourceBtn = o.source_url
+  const sourceBtn = isHttp(o.source_url)
     ? '<a class="btn btn-outline btn-sm" href="' + esc(o.source_url) + '" target="_blank" rel="noopener noreferrer">View Official Source</a>'
     : '';
   return '<div class="card opp-card" data-opp="' + o.id + '">' +
@@ -342,7 +343,7 @@ function companyCard(c, index) {
     '<p class="opp-meta" style="margin:8px 0">' + esc(c.description || '') + '</p>' +
     '<div class="tag-row" style="margin-bottom:10px">' + availability + progTags + '</div>' +
     '<div class="opp-actions"><button class="btn btn-primary btn-sm" data-cact="view" data-cid="' + c.id + '">View Company</button>' +
-      (c.website ? '<a class="btn btn-outline btn-sm" href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">Website</a>' : '') +
+      (isHttp(c.website) ? '<a class="btn btn-outline btn-sm" href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">Website</a>' : '') +
       '<button class="btn btn-ghost btn-sm save-btn" data-cact="save" data-cid="' + c.id + '">' + (saved ? '★' : '☆') + '</button>' +
     '</div></div>';
 }

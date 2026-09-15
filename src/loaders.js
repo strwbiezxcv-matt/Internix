@@ -9,6 +9,23 @@
 const db = require('./db');
 const locations = require('./locations');
 const programMap = require('./programMap');
+const { safeExternalUrl } = require('./security');
+
+/** Neutralise any URL field whose scheme is not http(s). Runs on every
+ *  company/opportunity object before it leaves the API, so a compromised or
+ *  malformed database row can never inject a javascript:/data: link. */
+function sanitizeUrls(obj) {
+  if (!obj) return obj;
+  for (const key of [
+    'logo_url', 'company_logo', 'website', 'company_website',
+    'official_website', 'company_official_website',
+    'careers_url', 'company_careers_url',
+    'application_url', 'source_url'
+  ]) {
+    if (obj[key] != null) obj[key] = safeExternalUrl(obj[key]);
+  }
+  return obj;
+}
 
 // Program name -> internal code lookup (used to rebuild program codes from
 // opportunity program names). Resolved per call so names added/seeded at
@@ -62,13 +79,13 @@ function companyById(companyId) {
       WHERE cp.company_id = ? ORDER BY p.name`,
     companyId
   );
-  return {
+  return sanitizeUrls({
     ...c,
     relevant_program_ids: progs.map(p => p.id),
     relevant_program_codes: progs.map(p => p.code),
     relevant_programs: progs.map(p => p.name),
     internship_status: c.internship_status || 'unknown',
-  };
+  });
 }
 
 /**
@@ -101,7 +118,7 @@ function loadOpportunity(id) {
     expired = String(opp.application_deadline).slice(0, 10) < today;
   }
 
-  return {
+  return sanitizeUrls({
     id: opp.id,
     company_id: opp.company_id,
     company_name: opp.company_name,
@@ -145,7 +162,7 @@ function loadOpportunity(id) {
     program_names: opportunityPrograms(id).map((p) => p.name),
     specializations: opportunitySpecializations(id).map((s) => s.name),
     skills: opportunitySkills(id).map((s) => s.name)
-  };
+  });
 }
 
 function loadAllOpenOpportunities() {
@@ -198,7 +215,7 @@ function loadAllCompanies() {
     const nameMap = namesToCodes();
     const oppProgramCodes = [...progNames].map((n) => nameMap.get(String(n).trim().toLowerCase()));
     const relevantCodes = [...new Set([...cpCodes, ...oppProgramCodes].filter(Boolean))];
-    return {
+    return sanitizeUrls({
       ...c,
       open_opportunities: openCount,
       verified_opportunities: verifiedCount,
@@ -215,7 +232,7 @@ function loadAllCompanies() {
         province: c.province || null,
         raw: c.location
       })
-    };
+    });
   });
 }
 
