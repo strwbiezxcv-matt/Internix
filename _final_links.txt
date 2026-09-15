@@ -1,0 +1,151 @@
+https://www.accenture.com/ph-en                      | Accenture Philippines | Metro Manila
+https://www.aboutamazon.com                          | Amazon Philippines | Metro Manila
+https://www.asiabrewery.com.ph/                      | Asia Brewery, Inc. | Bulacan
+https://www.axa.com.ph                               | AXA Philippines | Metro Manila
+https://www.ayalaland.com.ph                         | AyalaLand, Inc. | Metro Manila
+https://www.bpi.com.ph/                              | Bank of the Philippine Islands (BPI) | Metro Manila
+https://www.bdo.com.ph                               | BDO Unibank, Inc. | Metro Manila
+https://www.capgemini.com                            | Capgemini in the Philippines | Metro Manila
+https://www.chinabank.ph                             | China Banking Corporation | Metro Manila
+https://www.cisco.com                                | Cisco Systems Philippines | Metro Manila
+https://www.coca-colafemsa.com                       | Coca-Cola FEMSA Philippines | Metro Manila
+https://www.cognizant.com                            | Cognizant Technology Solutions | Metro Manila
+https://www.concentrix.com/                          | Concentrix Philippines | Metro Manila
+https://www.dell.com/en-ph                           | Dell Technologies Philippines | Metro Manila
+https://www.denso-ten.com/                           | DENSO TEN Solutions Philippines Corporation | Metro Manila
+https://www.eei.com.ph                               | EEI Corporation | Metro Manila
+https://www.globe.com.ph                             | Globe Telecom (Globe) | Metro Manila
+https://about.google                                 | Google Philippines | Metro Manila
+https://www.hp.com/ph-en                             | Hewlett-Packard (HP) Philippines | Metro Manila
+https://www.ibm.com/ph-en                            | IBM Philippines, Inc. | Metro Manila
+https://www.infosys.com/                             | Infosys Philippines | Metro Manila
+https://www.intel.com                                | Intel Philippines, Inc. | Metro Manila
+https://www.jollibee.com.ph                          | Jollibee Foods Corporation | Metro Manila
+https://www.manulife.com.ph                          | Manulife Philippines | Metro Manila
+https://www.meralco.com.ph                           | MERALCO (Manila Electric Company) | Metro Manila
+https://www.microsoft.com/en-ph                      | Microsoft Philippines, Inc. | Metro Manila
+https://www.mondenissin.com                          | Monde Nissin Corporation | Metro Manila
+https://www.mondelez.com.ph                          | Mondelez International (Philippines) | Metro Manila
+https://www.nestle.com.ph/                           | Nestle Philippines, Inc. | Metro Manila
+https://www.oracle.com/ph/                           | Oracle Philippines | Metro Manila
+https://www.pepsicophilippines.com/                  | Pepsi-Cola Products Philippines, Inc. | Bulacan
+https://www.petron.com                               | Petron Corporation | Metro Manila
+--none--                                             | Philippine Batteries, Inc. | Bulacan
+https://www.pnb.com.ph/                              | Philippine National Bank (PNB) | Metro Manila
+https://www.shell.com.ph                             | Pilipinas Shell Petroleum Corporation | Metro Manila
+https://www.pldt.com.ph                              | PLDT Inc. | Metro Manila
+https://www.prulifeuk.com.ph                         | Pru Life UK (Philippine Pru Life Assurance) | Metro Manila
+https://www.rcbc.com/                                | Rizal Commercial Banking Corporation (RCBC) | Metro Manila
+https://www.bosch.com.ph                             | Robert Bosch, Inc. (Bosch Philippines) | Bulacan
+https://www.sanmiguelbrewery.com.ph                  | San Miguel Brewery, Inc. | Bulacan
+https://www.sanmiguel.beer.ph                        | San Miguel Corporation | Metro Manila
+https://www.sanmiguelfoods.com.ph/                   | San Miguel Foods, Inc. | Bulacan
+https://www.securitybank.com/                        | Security Bank Corporation | Metro Manila
+https://www.smprime.com                              | SM Prime Holdings, Inc. | Metro Manila
+https://www.sunlife.com.ph                           | Sun Life of Canada (Philippines) | Metro Manila
+https://www.taskus.com                               | TaskUs, Inc. | Bulacan
+https://www.tcs.com                                  | Tata Consultancy Services Philippines | Metro Manila
+https://www.teleperformance.com                      | Teleperformance Philippines | Metro Manila
+https://www.telusdigital.com                         | Telus Digital Philippines | Metro Manila
+https://www.toyota.com.ph/                           | Toyota Motor Philippines Corporation | Metro Manila
+https://www.trendmicro.com/                          | Trend Micro Incorporated | Metro Manila
+https://www.unionbankph.com/                         | Union Bank of the Philippines (Unionbank) | Metro Manila
+https://www.urccc.com.ph                             | Universal Robina Corporation (Growers Plant) | Bulacan
+https://www.vitarich.com                             | Vitarich Corporation | Bulacan
+https://www.wns.com                                  | WNS Philippines | Metro Manila
+--none--                                             | Easecore Software and IT Corp. | Bulacan
+--none--                                             | Webmix Philippines Co. | Bulacan
+--none--                                             | MEDIANETH Software Development Services | Bulacan
+--none--                                             | FbCadCamcom Software Services | Bulacan
+--none--                                             | FDE Engineering Services | Bulacan
+--none--                                             | Perezonic Engineering Services | Bulacan
+--none--                                             | ROCKTECH ENGINEERING SERVICES | Bulacan
+--none--                                             | NWSteel Technologies, Inc. | Bulacan
+--none--                                             | Philform Manufacturing Corporation | Bulacan
+--none--                                             | Wellmade Manufacturing Corporation | Bulacan
+--none--                                             | Fahrenheit, Inc. | Bulacan
+--none--                                             | Rayvill Electrical Construction Corporation | Bulacan
+--none--                                             | Balagtas Tech Solutions | Bulacan
+--none--                                             | Calumpit Industrial Services | Bulacan
+--none--                                             | Marilao Food Processing Co. | Bulacan
+--none--                                             | PixelCraft Studios | Metro Manila
+--none--                                             | DataSync Solutions Philippines | Metro Manila
+--none--                                             | ArchVent Design Studio | Metro Manila
+--none--                                             | BrightLine Electrical Services | Metro Manila
+--none--                                             | GreenLeaf Accounting & Business Services | Metro Manila
+--none--                                             | LogiTrans Supply Chain Solutions | Metro Manila
+--none--                                             | MediCore Equipment Services | Metro Manila
+--none--                                             | BuildRight Construction & Design | Metro Manila
+--none--                                             | VoltEdge Electronics Philippines | Metro Manila
+--none--                                             | PrimePharma Logistics | Metro Manila
+https://www.nimbus.com.ph/                           | Nimbustechnologies, Inc. | Metro Manila
+--none--                                             | Metacom | Metro Manila
+https://www.motolite.com/                            | Ramcar Technology Incorporated (Motolite) | Metro Manila
+https://www.hondaphil.com/                           | Honda Cars Philippines, Inc. | Metro Manila
+--none--                                             | Toyota Shaw Inc. | Metro Manila
+--none--                                             | Toyota Alabang Inc. | Metro Manila
+https://www.ford.com.ph/                             | Ford Philippines | Metro Manila
+https://www.mitsubishi-motors.com.ph/                | Mitsubishi Motors Philippines Corporation | Metro Manila
+https://www.nissan.ph/                               | Nissan Philippines, Inc. | Metro Manila
+https://www.isuzu.com.ph/                            | Isuzu Philippines Corporation | Metro Manila
+https://www.metrobank.com.ph/                        | Metropolitan Bank & Trust Company (Metrobank) | Metro Manila
+https://www.landbank.com/                            | Land Bank of the Philippines (LANDBANK) | Metro Manila
+https://www.dbp.ph/                                  | Development Bank of the Philippines (DBP) | Metro Manila
+https://www.eastwestbanker.com/                      | EastWest Bank | Metro Manila
+https://www.chinabank.ph/                            | China Banking Corporation (China Bank) | Metro Manila
+https://www.maybank.com.ph/                          | Maybank Philippines, Inc. | Metro Manila
+https://www.hsbc.com.ph/                             | HSBC Philippines | Metro Manila
+https://www.ing.com.ph/                              | ING Philippines | Metro Manila
+https://www.ubs.com/ph/                              | UBS Philippines | Metro Manila
+--none--                                             | Helix | Metro Manila
+https://www.mdc.com.ph/                              | Makati Development Corporation (MDC) | Metro Manila
+https://www.nia.gov.ph/                              | National Irrigation Administration (NIA) | Metro Manila
+--none--                                             | Bradphilsmart | Bulacan
+https://www.megaprime.com.ph/                        | Mega Prime Foods, Inc. | Metro Manila
+https://www.eton.com.ph/                             | Eton Properties Philippines Inc. | Metro Manila
+--none--                                             | UMS Group Philippines Inc. | Metro Manila
+https://www.berderenewables.com/                     | Berde Renewables, Inc. | Metro Manila
+--none--                                             | ES Networks Philippines Inc. | Metro Manila
+--none--                                             | AM Group Kitchen Equipment and Supplies Inc. | Metro Manila
+https://www.chubb.com/ph-en/                         | Chubb Business Services | Metro Manila
+https://www.peoplepartners.ph/                       | PeoplePartners BPO Inc. | Metro Manila
+--none--                                             | Omega Healthcare Management Services, Inc. | Metro Manila
+--none--                                             | One Outsource Direct Corporation | Metro Manila
+--none--                                             | Global Transco ICT Solutions | Metro Manila
+https://business.inquirer.net/                       | Inquirer Interactive, Inc. | Metro Manila
+https://www.fwd.com.ph/                              | FWD Life Insurance Corporation | Metro Manila
+https://generalmilling.com/                          | General Milling Corporation | Metro Manila
+--none--                                             | Global City Auto Sales (Ford Global City) | Metro Manila
+--none--                                             | Global Electric Transportation (GET) Philippines | Metro Manila
+--none--                                             | Alecto General Technology Corporation | Metro Manila
+--none--                                             | Acceligent Solutions Inc. | Metro Manila
+--none--                                             | I Plus One, Inc. | Metro Manila
+https://inspirenextglobal.com/                       | Inspire Next Global Inc. | Metro Manila
+https://magnaprime.com.ph                            | Magna Prime Chemical Technologies, Inc. | Bulacan
+--none--                                             | Halla Chem Philippines Inc. | Bulacan
+https://www.jdfoods.com.ph                           | JD Foods Corporation | Bulacan
+https://www.goodyearcontainer.com                    | Goodyear Container Corporation | Bulacan
+https://www.bauertek.com                             | Bauertek Corp. | Bulacan
+https://www.pascuallab.com                           | Pascual Laboratories, Inc. | Bulacan
+https://www.froneri.com                              | Froneri Philippines, Inc. | Bulacan
+https://www.fisherfarms.com.ph                       | Fisher Farms, Inc. | Bulacan
+--none--                                             | EASE Technology Solutions, Inc. | Bulacan
+--none--                                             | Eontech Solutions Inc. | Bulacan
+--none--                                             | 3S Offshoring and Outsourcing Inc. | Bulacan
+--none--                                             | ACS Pro Global Corporation | Bulacan
+--none--                                             | DyipPay | Bulacan
+--none--                                             | Jireh Engineering Services | Bulacan
+--none--                                             | H&U Silicone Sealant Manufacturing OPC | Bulacan
+--none--                                             | A. L. Salazar Construction, Inc. | Bulacan
+https://www.prulifeuk.com.ph                         | Pru Life UK - Baliuag Office | Bulacan
+--none--                                             | Lachicae Curtain Shop | Bulacan
+--none--                                             | Golden Suntec Solutions, Inc. | Metro Manila
+--none--                                             | TeleEye Philippines Inc. | Metro Manila
+--none--                                             | Lightweight Solutions, Inc. | Metro Manila
+--none--                                             | Filmetrics Corporation | Metro Manila
+--none--                                             | Sapient Global Services, Inc. | Metro Manila
+https://www.lietz.com                                | Rudolf Lietz, Inc. | Metro Manila
+--none--                                             | Toyota Shaw Inc. - Shaw Boulevard Dealership | Metro Manila
+https://www.hyundai.com.ph                           | Hyundai Motor Philippines, Inc. | Metro Manila
+https://www.mdc.com.ph/                              | MDC ConQrete, Inc. - Circuit Makati Plant | Metro Manila
+https://www.mdc.com.ph/                              | MDC Equipment Solutions, Inc. - NLOC Equipment Yard | Metro Manila

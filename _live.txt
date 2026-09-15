@@ -1,0 +1,6 @@
+﻿128 Goodyear Container Corporation => https://www.goodyearcontainer.com
+129 Bauertek Corp. => https://www.bauertek.com
+131 Froneri Philippines, Inc. => https://www.froneri.com
+126 Halla Chem Philippines Inc. => null
+95 EastWest Bank => https://www.eastwestbanker.com/
+102 Makati Development Corporation (MDC) => https://www.mdc.com.ph/

@@ -1,0 +1,7 @@
+﻿{"id":95,"company_name":"EastWest Bank","official_website":"https://www.eastwestbanker.com/"}
+{"id":111,"company_name":"Chubb Business Services","official_website":"https://www.chubb.com/ph-en/"}
+{"id":124,"company_name":"Inspire Next Global Inc.","official_website":"https://inspirenextglobal.com/"}
+{"id":118,"company_name":"General Milling Corporation","official_website":"https://generalmilling.com/"}
+{"id":82,"company_name":"Nimbustechnologies, Inc.","official_website":"https://www.nimbus.com.ph/"}
+{"id":102,"company_name":"Makati Development Corporation (MDC)","official_website":"https://www.mdc.com.ph/"}
+total=151 official_website=93 website=67

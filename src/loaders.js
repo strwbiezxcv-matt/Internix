@@ -7,6 +7,36 @@
  */
 
 const db = require('./db');
+const locations = require('./locations');
+const programMap = require('./programMap');
+const { safeExternalUrl } = require('./security');
+
+/** Neutralise any URL field whose scheme is not http(s). Runs on every
+ *  company/opportunity object before it leaves the API, so a compromised or
+ *  malformed database row can never inject a javascript:/data: link. */
+function sanitizeUrls(obj) {
+  if (!obj) return obj;
+  for (const key of [
+    'logo_url', 'company_logo', 'website', 'company_website',
+    'official_website', 'company_official_website',
+    'careers_url', 'company_careers_url',
+    'application_url', 'source_url'
+  ]) {
+    if (obj[key] != null) obj[key] = safeExternalUrl(obj[key]);
+  }
+  return obj;
+}
+
+// Program name -> internal code lookup (used to rebuild program codes from
+// opportunity program names). Resolved per call so names added/seeded at
+// runtime are always visible (module load may happen before seeding).
+function namesToCodes() {
+  const m = new Map();
+  try {
+    db.all('SELECT code, name FROM programs').forEach((p) => m.set(String(p.name).trim().toLowerCase(), p.code));
+  } catch (e) { /* schema not ready yet */ }
+  return m;
+}
 
 /* --------------------------- opportunities --------------------------- */
 
@@ -38,10 +68,24 @@ function opportunitySkills(oppId) {
 }
 
 function companyById(companyId) {
-  return db.get(
-    'SELECT id, company_name, logo_url, description, address, location, city, province, region, industry, contact_info, website, careers_url, company_size, year_established, verification_status, source_name, source_url, verified_at FROM companies WHERE id = ?',
+  const c = db.get(
+    'SELECT id, company_name, logo_url, description, address, location, city, province, region, industry, contact_info, website, official_website, official_website_verified, source_status, careers_url, company_size, year_established, verification_status, source_name, source_url, verified_at, internship_status, internship_notes, last_verified_at FROM companies WHERE id = ?',
     companyId
   );
+  if (!c) return null;
+  const progs = db.all(
+    `SELECT p.id, p.code, p.name FROM company_programs cp
+       JOIN programs p ON p.id = cp.program_id
+      WHERE cp.company_id = ? ORDER BY p.name`,
+    companyId
+  );
+  return sanitizeUrls({
+    ...c,
+    relevant_program_ids: progs.map(p => p.id),
+    relevant_program_codes: progs.map(p => p.code),
+    relevant_programs: progs.map(p => p.name),
+    internship_status: c.internship_status || 'unknown',
+  });
 }
 
 /**
@@ -52,7 +96,10 @@ function loadOpportunity(id) {
     `SELECT o.*, c.company_name, c.logo_url AS company_logo,
             c.verification_status AS company_verification,
             c.industry AS company_industry,
-            c.website AS company_website
+            c.address AS company_address,
+            c.website AS company_website,
+            c.official_website AS company_official_website,
+            c.careers_url AS company_careers_url
        FROM internship_opportunities o
        JOIN companies c ON c.id = o.company_id
       WHERE o.id = ?`,
@@ -71,12 +118,16 @@ function loadOpportunity(id) {
     expired = String(opp.application_deadline).slice(0, 10) < today;
   }
 
-  return {
+  return sanitizeUrls({
     id: opp.id,
     company_id: opp.company_id,
     company_name: opp.company_name,
     company_logo: opp.company_logo,
     company_verification: opp.company_verification,
+    company_address: opp.company_address || null,
+    company_website: opp.company_website || null,
+    company_official_website: opp.company_official_website || null,
+    company_careers_url: opp.company_careers_url || null,
     position: opp.position,
     description: opp.description,
     field: field ? field.name : null,
@@ -97,11 +148,21 @@ function loadOpportunity(id) {
     status: opp.status,
     is_expired: expired,
     date_posted: opp.date_posted,
+    municipality: opp.municipality || null,
+    city: opp.city || null,
+    province: opp.province || null,
+    region: opp.region || null,
+    _loc: locations.parseLocation({
+      municipality: opp.municipality || null,
+      city: opp.city || null,
+      province: opp.province || null,
+      raw: opp.location
+    }),
     programs: opportunityPrograms(id).map((p) => p.code),
     program_names: opportunityPrograms(id).map((p) => p.name),
     specializations: opportunitySpecializations(id).map((s) => s.name),
     skills: opportunitySkills(id).map((s) => s.name)
-  };
+  });
 }
 
 function loadAllOpenOpportunities() {
@@ -115,7 +176,7 @@ function loadAllCompanies() {
   const rows = db.all('SELECT id FROM companies ORDER BY company_name');
   return rows.map((r) => {
     const c = db.get(
-      'SELECT id, company_name, logo_url, description, address, location, city, province, region, industry, contact_info, website, careers_url, company_size, year_established, verification_status, source_name, source_url, verified_at FROM companies WHERE id = ?',
+      'SELECT id, company_name, logo_url, description, address, location, municipality, city, province, region, industry, contact_info, website, official_website, official_website_verified, source_status, careers_url, company_size, year_established, verification_status, source_name, source_url, verified_at, internship_status, internship_notes, last_verified_at FROM companies WHERE id = ?',
       r.id
     );
     const openCount = db.get(
@@ -126,12 +187,21 @@ function loadAllCompanies() {
       `SELECT COUNT(*) AS c FROM internship_opportunities
         WHERE company_id = ? AND status = 'open' AND verification_status = 'verified'`, r.id
     ).c;
+    // Relevant programs from BOTH company_programs table AND the company's non-expired open opportunities.
+    const cpRows = db.all(
+      `SELECT p.code, p.name FROM company_programs cp
+         JOIN programs p ON p.id = cp.program_id
+        WHERE cp.company_id = ?`,
+      r.id
+    );
+    const cpCodes = cpRows.map(r => r.code);
+    const cpNames = cpRows.map(r => r.name);
     // Relevant programs from the company's non-expired open opportunities.
     const oppRows = db.all(
       `SELECT o.id FROM internship_opportunities o
         WHERE o.company_id = ? AND o.status = 'open'`, r.id
     );
-    const progNames = new Set();
+    const progNames = new Set(cpNames);
     const specNames = new Set();
     for (const o of oppRows) {
       const full = loadOpportunity(o.id);
@@ -140,15 +210,29 @@ function loadAllCompanies() {
       (full.specializations || []).forEach((n) => specNames.add(n));
     }
     const hasOpen = openCount > 0;
-    return {
+    // Program codes supported by the company's own opportunities (authoritative)
+    // unioned with any directory-level tags.
+    const nameMap = namesToCodes();
+    const oppProgramCodes = [...progNames].map((n) => nameMap.get(String(n).trim().toLowerCase()));
+    const relevantCodes = [...new Set([...cpCodes, ...oppProgramCodes].filter(Boolean))];
+    return sanitizeUrls({
       ...c,
       open_opportunities: openCount,
       verified_opportunities: verifiedCount,
       has_verified_opening: verifiedCount > 0,
       relevant_programs: [...progNames],
       relevant_specializations: [...specNames],
-      internship_availability: hasOpen ? 'available' : 'company_only'
-    };
+      internship_availability: hasOpen ? 'available' : 'company_only',
+      internship_status: c ? (c.internship_status || 'unknown') : 'unknown',
+      relevant_program_codes: relevantCodes,
+      municipality: c.municipality || null,
+      _loc: locations.parseLocation({
+        municipality: c.municipality || null,
+        city: c.city || null,
+        province: c.province || null,
+        raw: c.location
+      })
+    });
   });
 }
 
@@ -215,39 +299,41 @@ function resolveProgramKey(key) {
       WHERE lower(s.name) = lower(?)`, s
   );
   if (spec) return { program_id: spec.program_id, code: spec.code, name: spec.name, specialization: spec.spec };
+
+  // Also check specializations by name (for BINDTECH specializations and others)
+  const specName = db.get(
+    `SELECT s.name AS spec, p.id AS program_id, p.code, p.name
+       FROM specializations s JOIN programs p ON p.id = s.program_id
+      WHERE lower(s.name) = lower(?)`, s
+  );
+  if (specName) return { program_id: specName.program_id, code: specName.code, name: specName.name, specialization: specName.spec };
+
   return null;
 }
 
 /**
- * The user-selectable programs shown with FULL names. The four non-technical
- * majors plus Information Technology, together with the five Bachelor of
- * Industrial Technology specializations exposed as full program names.
+ * The user-selectable programs shown with FULL names (never acronyms).
+ * Driven by the programMap so the 10 supported programs appear as their full,
+ * human-friendly names while retaining their internal codes for matching.
  */
 function listProgramOptions() {
   const options = [];
-  const majors = ['BSBA', 'BSENTREP', 'COMPUTER ENGINEERING', 'INDUSTRIAL ENGINEERING', 'BSIT'];
-  for (const code of majors) {
+  for (const code of programMap.SELECTABLE) {
     const p = db.get('SELECT id, code, name FROM programs WHERE code = ?', code);
     if (!p) continue;
-    options.push({ value: code, label: p.name, program_code: code, program_id: p.id, specialization: null });
-  }
-  const specRows = db.all(
-    `SELECT s.name, p.code, p.id AS pid FROM specializations s JOIN programs p ON p.id = s.program_id WHERE p.code = 'BINDTECH' ORDER BY s.name`
-  );
-  for (const s of specRows) {
-    options.push({ value: s.name, label: s.name, program_code: 'BINDTECH', program_id: s.pid, specialization: s.name });
+    options.push({
+      value: code,
+      label: programMap.displayName(code),
+      program_code: code,
+      program_id: p.id,
+      specialization: null
+    });
   }
   return options;
 }
 
-const LOCATIONS = [
-  'Bulacan', 'Malolos', 'Meycauayan', 'San Jose del Monte', 'Marilao', 'Bocaue',
-  'Balagtas', 'Guiguinto', 'Plaridel', 'Baliwag', 'Pulilan', 'Calumpit', 'Santa Maria',
-  'Hagonoy', 'Paombong', 'Obando', 'Baliuag', 'Bustos', 'Bulakan', 'Norzagaray',
-  'Metro Manila', 'Manila', 'Quezon City', 'Makati', 'Taguig', 'Pasig', 'Mandaluyong',
-  'Pasay', 'Paranaque', 'Muntinlupa', 'Caloocan', 'Marikina', 'Las Pinas', 'Valenzuela',
-  'Navotas', 'Malabon', 'San Juan', 'Pateros'
-];
+// Grouped location options for the UI (Bulacan + Metro Manila + municipalities).
+const LOCATIONS = locations.groupLocations();
 
 module.exports = {
   loadOpportunity,

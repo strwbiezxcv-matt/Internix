@@ -1,0 +1,47 @@
+[
+ {
+  "id": 57,
+  "company_name": "Easecore Software and IT Corp.",
+  "city": "Santa Maria",
+  "municipality": "Santa Maria",
+  "province": "Bulacan",
+  "region": "Bulacan",
+  "location": "Santa Maria, Bulacan",
+  "address": null,
+  "official_website": null
+ },
+ {
+  "id": 83,
+  "company_name": "Metacom",
+  "city": null,
+  "municipality": null,
+  "province": "Metro Manila",
+  "region": "Metro Manila",
+  "location": "Metro Manila",
+  "address": null,
+  "official_website": null
+ },
+ {
+  "id": 103,
+  "company_name": "National Irrigation Administration (NIA)",
+  "city": "Quezon City",
+  "municipality": "Quezon City",
+  "province": "Metro Manila",
+  "region": "Metro Manila",
+  "location": "Quezon City, Metro Manila",
+  "address": "EDSA, Diliman, Quezon City",
+  "official_website": "https://www.nia.gov.ph/"
+ }
+]
+--- OPPORTUNITIES ---
+[
+ {
+  "id": 26,
+  "company_id": 57,
+  "company_name": "Easecore Software and IT Corp.",
+  "municipality": "Santa Maria",
+  "city": "Santa Maria",
+  "province": "Bulacan",
+  "location": "Santa Maria, Bulacan"
+ }
+]

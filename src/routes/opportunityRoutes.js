@@ -8,7 +8,10 @@
 
 const db = require('../db');
 const loaders = require('../loaders');
+const programMap = require('../programMap');
+const locations = require('../locations');
 const { ok, fail } = require('../util');
+const { parseId } = require('../security');
 
 function norm(s) {
   return String(s || '').trim().toLowerCase();
@@ -17,18 +20,30 @@ function norm(s) {
 function searchOver(o, q) {
   const hay = norm([
     o.position, o.description, o.company_name, o.location,
+    o._loc && o._loc.label,
     (o.programs || []).join(' '), (o.program_names || []).join(' '),
     (o.skills || []).join(' '), (o.specializations || []).join(' ')
   ].join(' '));
-  return hay.includes(q);
+  return hay.includes(q) || q.split(/\s+/).every((w) => hay.includes(w));
 }
 
-function locationMatches(oppLocation, wanted) {
-  const w = norm(wanted);
-  if (!w) return true;
-  const loc = norm(oppLocation);
-  if (loc.includes(w)) return true;
-  return false;
+// Location filter based on the opportunity's ACTUAL municipality/province.
+// A selected municipality matches ONLY that municipality - never the whole
+// province (§11: selecting Santa Maria must not return all of Bulacan).
+function locationMatches(opp, wanted) {
+  const sel = locations.resolveSelection(wanted);
+  if (!sel) return true;
+  const op = opp._loc;
+  if (!op) return false;
+  if (sel.municipality) {
+    return !!op.municipality && norm(op.municipality) === norm(sel.municipality);
+  }
+  return !!(op.province && sel.province && norm(op.province) === norm(sel.province));
+}
+
+function resolveProgramCode(value) {
+  const sel = loaders.resolveProgramKey(value);
+  return sel ? sel.code : null;
 }
 
 function register(router) {
@@ -66,9 +81,10 @@ function register(router) {
 
   /* ------------------------- company detail (public) ------------------------- */
   router.get('/api/companies/:id', (ctx) => {
-    const id = parseInt(ctx.params.id, 10);
+    const id = parseId(ctx.params.id);
+    if (!id) return fail(ctx.res, 'Company not found.', 404);
     const c = db.get(
-      'SELECT id, company_name, logo_url, description, address, location, city, province, region, industry, contact_info, website, careers_url, company_size, year_established, verification_status, source_name, source_url, verified_at FROM companies WHERE id = ?',
+      'SELECT id, company_name, logo_url, description, address, location, city, municipality, province, region, industry, contact_info, website, official_website, official_website_verified, source_status, careers_url, company_size, year_established, verification_status, source_name, source_url, verified_at, internship_status, internship_notes, last_verified_at FROM companies WHERE id = ?',
       id
     );
     if (!c) return fail(ctx.res, 'Company not found.', 404);
@@ -97,16 +113,18 @@ function register(router) {
       if (q) all = all.filter((o) => searchOver(o, q));
     }
     if (qp.program) {
-      const res = loaders.resolveProgramKey(qp.program);
-      if (res) {
-        all = all.filter((o) =>
-          (o.programs || []).some((p) => norm(p) === norm(res.code)) ||
-          (res.specialization && (o.specializations || []).some((s) => norm(s) === norm(res.specialization))));
+      const sel = loaders.resolveProgramKey(qp.program);
+      if (sel) {
+        const code = sel.code;
+        all = all.filter((o) => {
+          const pm = programMap.programMatch([code], o.programs || []);
+          return pm.tier !== 'mismatch'; // exact, related, or open-to-all
+        });
       }
     }
     if (qp.location) {
       const w = norm(qp.location);
-      if (w) all = all.filter((o) => locationMatches(o.location, qp.location));
+      if (w) all = all.filter((o) => locationMatches(o, qp.location));
     }
     if (qp.work_arrangement) {
       const w = norm(qp.work_arrangement);
@@ -122,7 +140,19 @@ function register(router) {
     }
 
     const sort = norm(qp.sort);
-    if (sort === 'company') {
+    if (qp.location && !sort) {
+      // Prioritize opportunities in the exact selected municipality/city;
+      // same-province opportunities follow as secondary results.
+      const sel = locations.resolveSelection(qp.location);
+      const mun = sel && sel.municipality ? norm(sel.municipality) : null;
+      if (mun) {
+        all.sort((a, b) => {
+          const am = a._loc && norm(a._loc.municipality) === mun ? 0 : 1;
+          const bm = b._loc && norm(b._loc.municipality) === mun ? 0 : 1;
+          return am - bm || String(b.date_posted || '').localeCompare(String(a.date_posted || ''));
+        });
+      }
+    } else if (sort === 'company') {
       all.sort((a, b) => String(a.company_name || '').localeCompare(String(b.company_name || '')));
     } else if (sort === 'position') {
       all.sort((a, b) => String(a.position || '').localeCompare(String(b.position || '')));
@@ -135,7 +165,8 @@ function register(router) {
 
   /* ------------------------- opportunity detail (public) ------------------------- */
   router.get('/api/opportunities/:id', (ctx) => {
-    const id = parseInt(ctx.params.id, 10);
+    const id = parseId(ctx.params.id);
+    if (!id) return fail(ctx.res, 'Opportunity not found.', 404);
     const opp = loaders.loadOpportunity(id);
     if (!opp) return fail(ctx.res, 'Opportunity not found.', 404);
     return ok(ctx.res, { opportunity: opp });

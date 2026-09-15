@@ -1,0 +1,121 @@
+290:}
+291:
+292:async function openDetail(id) {
+293:  try {
+294:    const d = await api('GET', '/api/opportunities/' + id);
+295:    const o = d.opportunity;
+296:    const progs = (o.program_names && o.program_names.length)
+297:      ? o.program_names
+298:      : (o.programs || []).map((p) => programNames([p])[0] || p);
+299:    const address = o.company_address
+300:      || (o._loc && o._loc.label ? o._loc.label : (o.location || ''));
+301:    const link = pickOppLink(o);
+302:    openModal(detailSheet({
+303:      name: o.company_name,
+304:      logo: o.company_logo,
+305:      title: o.position,
+306:      desc: o.description,
+307:      address: address,
+308:      programs: progs,
+309:      href: link ? link.url : null,
+310:      label: link ? link.label : null
+311:    }));
+312:  } catch (err) { toast(err.message, true); }
+313:}
+314:function companyCard(c, index) {
+315:  const loc = c.location || (c.city ? c.city + ', ' + c.province : (c.province || 'Location not specified'));
+316:  const availability = c.has_verified_opening
+317:    ? '<span class="tag">Internship available</span>'
+318:    : '<span class="tag neutral">Company directory entry</span>';
+319:  const progs = (c.relevant_programs || []);
+320:  const progTags = progs.slice(0, 3).map((p) => '<span class="tag">' + esc(p) + '</span>').join('');
+321:  const suffix = (index !== undefined && (index > 7)) ? ' style="order:2"' : '';
+322:  const saved = isSavedCompany(c.id);
+323:  return '<div class="card company-card" data-cid="' + c.id + '"' + suffix + '>' +
+324:    '<div class="opp-card-top">' + logoHTML(c.company_name, c.logo_url) +
+325:      '<div style="flex:1;min-width:0"><div class="opp-position">' + esc(c.company_name) + '</div>' +
+326:      '<div class="opp-meta">' + esc(c.industry || '') + ' &bull; ' + esc(loc) + '</div></div></div>' +
+327:    '<p class="opp-meta" style="margin:8px 0">' + esc(c.description || '') + '</p>' +
+328:    '<div class="tag-row" style="margin-bottom:10px">' + availability + progTags + '</div>' +
+329:    '<div class="opp-actions"><button class="btn btn-primary btn-sm" data-cact="view" data-cid="' + c.id + '">View Company</button>' +
+330:      (c.website ? '<a class="btn btn-outline btn-sm" href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">Website</a>' : '') +
+331:      '<button class="btn btn-ghost btn-sm save-btn" data-cact="save" data-cid="' + c.id + '">' + (saved ? '★' : '☆') + '</button>' +
+332:    '</div></div>';
+333:}
+334:
+335:async function openCompanyDetail(id) {
+336:  try {
+337:    const d = await api('GET', '/api/companies/' + id);
+338:    const c = d.company;
+339:    const opps = d.opportunities || [];
+340:    const progs = (d.relevant_program_names && d.relevant_program_names.length)
+341:      ? d.relevant_program_names
+342:      : (c.relevant_programs || []);
+343:    const address = c.address
+344:      || c.location
+345:      || (c.city ? c.city + ', ' + c.province : (c.province || ''));
+346:    const link = pickCompanyLink(c);
+347:    const title = opps.length === 1 ? opps[0].position
+348:      : (opps.length > 1 ? 'Internship / OJT opportunities available' : '');
+349:    const oppRows = opps.length
+350:      ? '<div class="detail-openings"><span class="detail-label">Current Openings</span><div class="small-opp-list">' +
+351:        opps.map((o) => '<div class="small-opp" data-opp="' + o.id + '">' +
+352:          '<span class="opp-position">' + esc(o.position) + '</span>' +
+353:          '<span class="d-chevy">&#8250;</span></div>').join('') +
+354:        '</div></div>'
+355:      : '';
+356:    openModal(detailSheet({
+357:      name: c.company_name,
+358:      logo: c.logo_url,
+359:      title: title,
+360:      desc: (c.description || '').slice(0, 320),
+361:      address: address,
+362:      programs: progs,
+363:      href: link ? link.url : null,
+364:      label: link ? link.label : null
+365:    }) + oppRows);
+366:    $('#modalContent').querySelectorAll('.small-opp').forEach((el) =>
+367:      el.addEventListener('click', () => openDetail(+el.dataset.opp)));
+368:  } catch (err) { toast(err.message, true); }
+369:}
+370:/* ============================== LANDING PAGE ============================== */
+371:function landingView() {
+372:  const options = state.catalog ? (state.catalog.program_options || []) : [];
+373:  const sel = selectedProgram();
+374:  const progBubbles = options.slice(0, 10).map((o) =>
+375:    '<button type="button" class="prog-bubble" data-prog="' + esc(o.value) + '">' + esc(o.label) + '</button>').join('');
+376:  const featured = state.opps.slice(0, 3).map((o) => oppCard(o)).join('');
+377:  const popCos = state.companies.slice(0, 6);
+378:  const popCards = popCos.map((c, i) => companyCard(c, i)).join('');
+379:  const locs = (state.catalog && state.catalog.locations) || ['Bulacan', 'Metro Manila'];
+380:  const savedLoc = selectedLocation();
+381:
+382:  app.innerHTML =
+383:    '<section class="hero">' +
+384:      '<h1>Find Internship Opportunities That Match Your Program</h1>' +
+385:      '<p class="hero-sub">Explore internship opportunities and companies across Bulacan and Metro Manila based on your academic program. Browse freely, discover companies, and visit official sources to apply - no account needed.</p>' +
+386:      '<form class="hero-program-form" id="heroProgForm">' +
+387:        '<label for="heroProgram">Which program are you taking?</label>' +
+388:        '<div class="hero-select-row"><select id="heroProgram" class="hero-select">' + programOptionsHtml(sel, 'Select your program...') + '</select>' +
+389:        '<button class="btn btn-primary btn-lg" type="submit">Find My Matches</button></div>' +
+390:        '<div class="hero-select-row" style="margin-top:10px"><select id="heroLocation" class="hero-select" aria-label="Preferred location">' + locationOptionsHtml(savedLoc, 'Anywhere (Bulacan + Metro Manila)') + '</select></div>' +
+391:      '</form>' +
+392:      '<div class="hero-cta">' +
+393:        '<a class="btn btn-outline btn-lg" href="#/opportunities">Browse All Opportunities</a>' +
+394:        '<a class="btn btn-ghost btn-lg" href="#/companies">Explore Companies</a>' +
+395:      '</div>' +
+396:    '</section>' +
+397:    (featured ? '<section class="section"><div class="section-head"><h2>Featured Internship Opportunities</h2><a class="link" href="#/opportunities">View all &rarr;</a></div><div class="grid grid-3" id="featuredGrid">' + featured + '</div></section>' : '') +
+398:    (popCards ? '<section class="section"><div class="section-head"><h2>Popular Companies</h2><a class="link" href="#/companies">Explore all &rarr;</a></div><div class="grid grid-3" id="companyGrid">' + popCards + '</div></section>' : '') +
+399:    '<section class="section" style="margin-top:34px"><div class="section-head"><h2>Browse by Program</h2></div><div class="pills" id="browseByProgram">' + progBubbles + '</div></section>' +
+400:    '<section class="feature-row"><div class="card feature-card"><div class="icon">' + '\u{1F50D}' + '</div><h3>Discover</h3><p>Browse internships and a growing company directory across Bulacan and Metro Manila.</p></div>' +
+401:      '<div class="card feature-card"><div class="icon">' + '\u{1F50C}' + '</div><h3>Match by program</h3><p>Select your academic program and see relevant internships ranked by compatibility.</p></div>' +
+402:      '<div class="card feature-card"><div class="icon">' + '\u{1F4C1}' + '</div><h3>Apply on the source</h3><p>Every listing links to the official company page. Application happens externally.</p></div>' +
+403:    '</section>' +
+404:    '<section class="how-it-works"><h2>How Internix Works</h2><ol><li>Select your academic program (or browse freely).</li><li>Internix ranks internships and companies relevant to your program.</li><li>Review company details and eligibility, then open the official source to apply.</li></ol></section>';
+405:
+406:  const runMatch = () => {
+407:    const code = $('#heroProgram').value;
+408:    if (!code) { toast('Please select your program.', true); return; }
+409:    const loc = $('#heroLocation') ? $('#heroLocation').value : '';
+410:    const profile = { programs: [code], program: code, specialization: null, location: loc || null, work_arrangement: null };

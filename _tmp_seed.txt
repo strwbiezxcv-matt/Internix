@@ -1,0 +1,121 @@
+440:    ensureCompany(s);
+441:  }
+442:
+443:  // --- More small Bulacan companies ---
+444:  const moreBulacan = [
+445:    {
+446:      company_name: 'Odecci Solutions Inc.',
+447:      industry: 'IT Services / Software Solutions',
+448:      city: 'Guiguinto',
+449:      province: 'Bulacan',
+450:      description: 'IT solutions company providing software development, systems integration, and technology consulting services.',
+451:      website: null,
+452:      careers_url: null,
+453:      company_size: 'Small',
+454:      verification_status: 'needs_review',
+455:      source_name: 'Public business directory listing',
+456:      source_url: null,
+457:      internship_status: 'potential',
+458:      internship_notes: 'IT services company; relevant for IT and Computer Engineering OJT; no verified current internship opening.'
+459:    },
+460:    {
+461:      company_name: 'WebXtreme Philippines',
+462:      industry: 'Web Development / Digital Services',
+463:      city: 'Guiguinto',
+464:      province: 'Bulacan',
+465:      description: 'Web design and digital services company offering website development, e-commerce solutions, and digital marketing support.',
+466:      website: null,
+467:      careers_url: null,
+468:      company_size: 'Small',
+469:      verification_status: 'needs_review',
+470:      source_name: 'Public business directory listing',
+471:      source_url: null,
+472:      internship_status: 'potential',
+473:      internship_notes: 'Web development company suitable for IT/CE students; no verified current internship opening.'
+474:    },
+475:    {
+476:      company_name: 'Softmax Solutions OPC',
+477:      industry: 'Software / IT Solutions',
+478:      city: 'Meycauayan',
+479:      province: 'Bulacan',
+480:      description: 'Software and IT solutions provider offering custom software development, database systems, and business automation.',
+481:      website: null,
+482:      careers_url: null,
+483:      company_size: 'Small',
+484:      verification_status: 'needs_review',
+485:      source_name: 'Public business directory listing',
+486:      source_url: null,
+487:      internship_status: 'potential',
+488:      internship_notes: 'Software/IT company relevant for academic OJT; no verified current internship opening.'
+489:    },
+490:    {
+491:      company_name: 'Kingine Tech Solutions',
+492:      industry: 'Technology / IT Services',
+493:      city: 'Bulakan',
+494:      province: 'Bulacan',
+495:      description: 'Technology solutions company providing IT support, software development, and digital transformation services.',
+496:      website: null,
+497:      careers_url: null,
+498:      company_size: 'Small',
+499:      verification_status: 'needs_review',
+500:      source_name: 'Public business directory listing',
+501:      source_url: null,
+502:      internship_status: 'potential',
+503:      internship_notes: 'Technology company suitable for IT/CE OJT; no verified current internship opening.'
+504:    }
+505:  ];
+506:
+507:  // --- Link company programs for small Bulacan companies ---
+508:  linkCompanyPrograms('Easecore Software and IT Corp.', ['BSIT', 'COMPUTER ENGINEERING']);
+509:  linkCompanyPrograms('Webmix Philippines Co.', ['BSIT', 'COMPUTER ENGINEERING']);
+510:  linkCompanyPrograms('MEDIANETH Software Development Services', ['BSIT', 'COMPUTER ENGINEERING']);
+511:  linkCompanyPrograms('Odecci Solutions Inc.', ['BSIT', 'COMPUTER ENGINEERING']);
+512:  linkCompanyPrograms('WebXtreme Philippines', ['BSIT', 'COMPUTER ENGINEERING']);
+513:  linkCompanyPrograms('Softmax Solutions OPC', ['BSIT', 'COMPUTER ENGINEERING']);
+514:  linkCompanyPrograms('Kingine Tech Solutions', ['BSIT', 'COMPUTER ENGINEERING']);
+515:  linkCompanyPrograms('FbCadCamcom Software Services', ['BSIT', 'COMPUTER ENGINEERING', 'INDUSTRIAL ENGINEERING']);
+516:  linkCompanyPrograms('FDE Engineering Services', ['INDUSTRIAL ENGINEERING', 'COMPUTER ENGINEERING']);
+517:  linkCompanyPrograms('Perezonic Engineering Services', ['INDUSTRIAL ENGINEERING', 'COMPUTER ENGINEERING']);
+518:  linkCompanyPrograms('ROCKTECH ENGINEERING SERVICES', ['INDUSTRIAL ENGINEERING', 'COMPUTER ENGINEERING']);
+519:  linkCompanyPrograms('NWSteel Technologies, Inc.', ['INDUSTRIAL ENGINEERING']);
+520:  linkCompanyPrograms('Philform Manufacturing Corporation', ['INDUSTRIAL ENGINEERING']);
+521:  linkCompanyPrograms('Wellmade Manufacturing Corporation', ['INDUSTRIAL ENGINEERING', 'FOOD TECHNOLOGY']);
+522:  linkCompanyPrograms('Fahrenheit, Inc.', ['INDUSTRIAL ENGINEERING', 'COMPUTER ENGINEERING']);
+523:  linkCompanyPrograms('Rayvill Electrical Construction Corporation', ['ELECTRICAL TECHNOLOGY', 'INDUSTRIAL ENGINEERING', 'COMPUTER ENGINEERING']);
+524:  linkCompanyPrograms('Balagtas Tech Solutions', ['BSIT', 'COMPUTER ENGINEERING']);
+525:  linkCompanyPrograms('Calumpit Industrial Services', ['INDUSTRIAL ENGINEERING']);
+526:  linkCompanyPrograms('Marilao Food Processing Co.', ['FOOD TECHNOLOGY', 'INDUSTRIAL ENGINEERING']);
+527:
+528:  // --- Link company programs for Metro Manila small companies ---
+529:  linkCompanyPrograms('PixelCraft Studios', ['COMPUTER ENGINEERING', 'BSIT', 'COMPUTER TECHNOLOGY']);
+530:  linkCompanyPrograms('DataSync Solutions Philippines', ['BSIT', 'COMPUTER ENGINEERING', 'BSBA']);
+531:  linkCompanyPrograms('ArchVent Design Studio', ['ARCHITECTURAL DRAFTING']);
+532:  linkCompanyPrograms('BrightLine Electrical Services', ['ELECTRICAL TECHNOLOGY', 'INDUSTRIAL ENGINEERING']);
+533:  linkCompanyPrograms('GreenLeaf Accounting & Business Services', ['BSBA', 'BSENTREP']);
+534:  linkCompanyPrograms('LogiTrans Supply Chain Solutions', ['INDUSTRIAL ENGINEERING', 'BSBA']);
+535:  linkCompanyPrograms('MediCore Equipment Services', ['ELECTRICAL TECHNOLOGY', 'COMPUTER TECHNOLOGY', 'INDUSTRIAL ENGINEERING']);
+536:  linkCompanyPrograms('BuildRight Construction & Design', ['INDUSTRIAL ENGINEERING', 'ARCHITECTURAL DRAFTING']);
+537:  linkCompanyPrograms('VoltEdge Electronics Philippines', ['COMPUTER ENGINEERING', 'ELECTRICAL TECHNOLOGY', 'INDUSTRIAL ENGINEERING']);
+538:  linkCompanyPrograms('PrimePharma Logistics', ['FOOD TECHNOLOGY', 'INDUSTRIAL ENGINEERING']);
+539:
+540:  // --- Engineering & industrial small companies (Bulacan) ---
+541:  const engineeringBulacan = [
+542:    {
+543:      company_name: 'FbCadCamcom Software Services',
+544:      industry: 'Software / CAD-CAM Technology',
+545:      city: 'San Jose del Monte',
+546:      province: 'Bulacan',
+547:      description: 'Software services company specializing in CAD/CAM applications, technical software, and engineering design tools.',
+548:      website: null,
+549:      careers_url: null,
+550:      company_size: 'Small',
+551:      verification_status: 'needs_review',
+552:      source_name: 'Public business directory listing',
+553:      source_url: null,
+554:      internship_status: 'potential',
+555:      internship_notes: 'Software/CAD-CAM company relevant for Computer Engineering, IT, and Industrial Engineering students; no verified current internship opening.'
+556:    },
+557:    {
+558:      company_name: 'FDE Engineering Services',
+559:      industry: 'Engineering Services / MEP',
+560:      city: 'Malolos',
